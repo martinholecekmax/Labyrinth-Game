@@ -1,16 +1,18 @@
+package game.sprites;
 import java.awt.image.BufferedImage;
 
 public class Textures {
 	
 	private SpriteSheet spriteSheet = null;
-	BufferedImage player;
-	BufferedImage missile;
-	BufferedImage enemy;
-	BufferedImage background;
-	BufferedImage wall;
+	public BufferedImage player;
+	public BufferedImage missile;
+	public BufferedImage enemy;
+	public BufferedImage background;
+	public BufferedImage wall;
+	public BufferedImage goal;
 	
-	public Textures(GameWindow gameWindow) {
-		spriteSheet = new SpriteSheet(gameWindow.getSpriteSheet());
+	public Textures(BufferedImage spriteSheet) {
+		this.spriteSheet = new SpriteSheet(spriteSheet);
 		getTextures();
 	}
 	
@@ -20,5 +22,6 @@ public class Textures {
 		background = spriteSheet.grabImage(1, 16, 32, 32);
 		enemy = spriteSheet.grabImage(2, 4, 32, 32);
 		wall = spriteSheet.grabImage(1, 15, 32, 32);
+		goal = spriteSheet.grabImage(12, 23, 32, 32);
 	}
 }

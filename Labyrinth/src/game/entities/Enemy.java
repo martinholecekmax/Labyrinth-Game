@@ -1,12 +1,17 @@
+package game.entities;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.util.Random;
+
+import game.engine.GameObject;
+import game.engine.Level;
+import game.enums.TileType;
+import game.sprites.Textures;
 
 public class Enemy extends GameObject implements IEntityEnemy {
 	private static final int STEPS = 1;
 	private Textures textures;
 	private Level level;
-	private int posRow;
-	private int posCol;
 	private int direction = 0;
 	private boolean moveLeft = false;
 
@@ -18,24 +23,12 @@ public class Enemy extends GameObject implements IEntityEnemy {
 		this.level = level;
 	}
 
-	public int getRow() {
-		return row;
-	}
-
-	public int getCol() {
-		return col;
-	}
-
 	public boolean moveUp() {
 		if (row <= 0)
 			return false;
 
-		posRow = (int) Math.floor((row - STEPS) / 32);
-		posCol = (int) Math.floor(col / 32);
-
-//		debugPosition();
-
-		if (level.getLevelObject(posRow, posCol) != 4) {
+		Rectangle rect = new Rectangle(row - 1, col, 32, 32);
+		if (level.intersects(rect, TileType.WALL) == false) {
 			row = row - STEPS;
 			return true;
 		}
@@ -46,12 +39,8 @@ public class Enemy extends GameObject implements IEntityEnemy {
 		if (row >= 288)
 			return false;
 
-		posRow = (int) Math.floor((row + 32) / 32);
-		posCol = (int) Math.floor(col / 32);
-
-//		debugPosition();
-
-		if (level.getLevelObject(posRow, posCol) != 4) {
+		Rectangle rect = new Rectangle(row + 1, col, 32, 32);
+		if (level.intersects(rect, TileType.WALL) == false) {
 			row = row + STEPS;
 			return true;
 		}
@@ -62,12 +51,8 @@ public class Enemy extends GameObject implements IEntityEnemy {
 		if (col >= 288)
 			return false;
 
-		posRow = (int) Math.floor(row / 32);
-		posCol = (int) Math.floor((col + 32) / 32);
-
-//		debugPosition();
-
-		if (level.getLevelObject(posRow, posCol) != 4) {
+		Rectangle rect = new Rectangle(row, col + 1, 32, 32);
+		if (level.intersects(rect, TileType.WALL) == false) {
 			col = col + STEPS;
 			return true;
 		}
@@ -78,12 +63,8 @@ public class Enemy extends GameObject implements IEntityEnemy {
 		if (col <= 0)
 			return false;
 
-		posRow = (int) Math.floor(row / 32);
-		posCol = (int) Math.floor((col - STEPS) / 32);
-
-//		debugPosition();
-
-		if (level.getLevelObject(posRow, posCol) != 4) {
+		Rectangle rect = new Rectangle(row, col - 1, 32, 32);
+		if (level.intersects(rect, TileType.WALL) == false) {
 			col = col - STEPS;
 			return true;
 		}
@@ -108,12 +89,5 @@ public class Enemy extends GameObject implements IEntityEnemy {
 
 	public void render(Graphics g) {
 		g.drawImage(textures.enemy, col, row, null);
-	}
-
-	public void debugPosition() {
-		System.out.println("Row: " + row);
-		System.out.println("Pos Row: " + posRow);
-		System.out.println("Col: " + col);
-		System.out.println("Pos Col: " + posCol);
 	}
 }

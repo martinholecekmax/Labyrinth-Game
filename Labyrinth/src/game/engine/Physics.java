@@ -1,4 +1,8 @@
+package game.engine;
 import java.util.LinkedList;
+
+import game.entities.IEntityEnemy;
+import game.gun.IEntityBullets;
 
 public class Physics {
 	public static boolean Collision(IEntityBullets entityA, LinkedList<IEntityEnemy> entityB) {

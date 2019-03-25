@@ -1,4 +1,7 @@
+package game.sprites;
 import java.awt.Graphics;
+
+import game.engine.Level;
 
 public class Background {
 	private Textures textures;

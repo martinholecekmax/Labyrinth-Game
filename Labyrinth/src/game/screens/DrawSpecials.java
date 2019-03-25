@@ -1,20 +1,10 @@
+package game.screens;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 
-public class GameOver {
-	public void render(Graphics g, int width, int height) {
-
-		drawTransparentBackground(g, width, height);
-
-		Font font = new Font("arial", Font.BOLD, 28);
-		g.setFont(font);
-		g.setColor(Color.WHITE);
-		drawCenteredString("Game Over", width, height, g);
-	}
-
-	private void drawTransparentBackground(Graphics g, int width, int height) {
+public class DrawSpecials {
+	public void drawTransparentBackground(Graphics g, int width, int height) {
 		int alpha = 127; // 50% transparent
 		Color myColour = new Color(0, 0, 0, alpha);
 		g.setColor(myColour);
