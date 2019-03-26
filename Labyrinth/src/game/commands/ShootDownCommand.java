@@ -1,12 +1,13 @@
 package game.commands;
 
 import game.engine.GameWindow;
-import game.enums.ShootDirection;
+import game.enums.Direction;
 
 public class ShootDownCommand implements ICommand{
 
 	@Override
-	public void execute(GameWindow gameWindow) {
-		gameWindow.shoot(ShootDirection.DOWN);
+	public boolean execute(GameWindow gameWindow) {
+		gameWindow.shoot(Direction.DOWN);
+		return true;
 	}
 }

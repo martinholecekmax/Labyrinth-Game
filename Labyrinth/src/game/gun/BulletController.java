@@ -22,12 +22,14 @@ public class BulletController {
 		for (int index = 0; index < bullets.size(); index++) {
 			bullet = bullets.get(index);
 			bullet.tick();
-			if (bullet.getCol() > level.getColSize() * level.getTileSize() || bullet.getCol() < 0
-					|| bullet.getRow() > level.getRowSize() * level.getTileSize() || bullet.getRow() < 0)
+//			if (bullet.getCol() > level.getColSize() || bullet.getCol() < 0
+//					|| bullet.getRow() > level.getRowSize() || bullet.getRow() < 0)
+//				removeBullet(bullet);
+			if(!level.contains(bullet.getBounds()))
 				removeBullet(bullet);
-			if (level.intersects(bullet.getBounds(), TileType.WALL)) {
+				
+			if (level.intersects(bullet.getBounds(), TileType.WALL))
 				removeBullet(bullet);
-			}
 		}
 	}
 

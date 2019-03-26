@@ -1,4 +1,5 @@
 package game.tiles;
+
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
@@ -12,25 +13,20 @@ public class Tile {
 	public boolean solid;
 	public int tileSize;
 	public TileType tileType;
-	
 
-	public Tile(int row, int col, int tileSize,Textures textures, TileType tileType, boolean solid) {
+	public Tile(int row, int col, int tileSize, Textures textures, TileType tileType) {
 		this.row = row;
 		this.col = col;
 		this.tileSize = tileSize;
 		this.textures = textures;
-		this.solid = solid;
 		this.tileType = tileType;
 	}
 
 	public void render(Graphics g) {
 	};
 
-	public boolean solid() {
-		return solid;
-	}
-	
+
 	public Rectangle getBounds() {
-		return new Rectangle(row * tileSize, col * tileSize, tileSize, tileSize);
+		return new Rectangle(col * tileSize, row * tileSize, tileSize, tileSize);
 	}
 }

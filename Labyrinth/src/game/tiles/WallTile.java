@@ -6,8 +6,8 @@ import game.sprites.Textures;
 
 public class WallTile extends Tile {
 
-	public WallTile(int row, int col, int tileSize, Textures textures, Boolean solid) {
-		super(row, col, tileSize, textures, TileType.WALL, solid);
+	public WallTile(int row, int col, int tileSize, Textures textures) {
+		super(row, col, tileSize, textures, TileType.WALL);
 	}
 
 	@Override

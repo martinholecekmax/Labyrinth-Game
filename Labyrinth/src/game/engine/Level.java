@@ -1,4 +1,5 @@
 package game.engine;
+
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.util.LinkedList;
@@ -12,17 +13,31 @@ import game.tiles.WallTile;
 public class Level {
 	private Textures textures;
 
-	private int[][] grid = new int[][] { 
-		{ 0, 0, 0, 0, 0, 4, 0, 0, 0, 4 }, 
-		{ 0, 4, 4, 4, 4, 4, 4, 4, 0, 4 },
-		{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, 
-		{ 4, 4, 4, 4, 4, 4, 4, 4, 0, 4 }, 
-		{ 0, 0, 4, 0, 0, 0, 4, 0, 0, 0 },
-		{ 4, 4, 4, 0, 0, 0, 4, 4, 0, 4 }, 
-		{ 0, 0, 4, 0, 0, 0, 4, 0, 0, 4 }, 
-		{ 4, 4, 4, 4, 4, 4, 4, 4, 0, 4 },
-		{ 1, 4, 0, 0, 0, 4, 0, 0, 0, 4 }, 
-		{ 0, 0, 0, 4, 0, 0, 0, 4, 0, 4 } };
+	// private int[][] grid = new int[][] { { 0, 0, 0, 0, 0, 4, 0, 4 }, { 4, 0, 4,
+	// 4, 4, 4, 4, 4 },
+	// { 0, 0, 0, 0, 0, 0, 0, 0 }, { 4, 4, 4, 4, 4, 4, 4, 4 }, { 4, 0, 4, 0, 0, 0,
+	// 4, 4 },
+	// { 4, 4, 4, 0, 0, 0, 4, 4 }, { 4, 0, 4, 0, 0, 0, 4, 4 }, { 4, 1, 0, 0, 0, 0,
+	// 0, 4 },
+	// { 4, 0, 0, 4, 0, 0, 0, 4 } };
+//	private int[][] grid = new int[][] { { 0, 0, 0, 0, 0, 4, 0, 0, 0, 4 }, { 4, 0, 4, 4, 4, 4, 4, 4, 0, 4 },
+//			{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 }, { 4, 4, 4, 4, 4, 4, 4, 4, 0, 4 }, { 4, 0, 4, 0, 0, 0, 4, 0, 0, 4 },
+//			{ 4, 4, 4, 0, 0, 0, 4, 4, 0, 4 }, { 4, 0, 0, 0, 0, 0, 0, 0, 0, 4 }, { 4, 4, 4, 4, 4, 4, 4, 4, 0, 4 },
+//			{ 4, 1, 0, 0, 0, 4, 0, 0, 0, 4 }, { 4, 0, 0, 4, 0, 0, 0, 4, 0, 4 } };
+
+	private int[][] grid = new int[][] { { 0, 0, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0, 0, 0, 4 },
+			{ 4, 0, 4, 4, 4, 4, 4, 4, 0, 4, 0, 0, 0, 0, 0, 4 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+			{ 4, 4, 4, 4, 4, 4, 4, 4, 0, 4, 0, 0, 0, 0, 0, 4 }, { 4, 0, 4, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 4 },
+			{ 4, 4, 4, 0, 0, 0, 4, 4, 0, 4, 0, 0, 0, 0, 0, 4 }, { 4, 0, 4, 0, 0, 0, 4, 0, 0, 4, 0, 0, 0, 0, 0, 4 },
+			{ 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 }, { 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 },
+			{ 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 }, { 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 },
+			{ 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 }, { 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 },
+			{ 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 }, { 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 },
+			{ 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 }, { 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 },
+			{ 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 }, { 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 },
+			{ 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 }, { 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 },
+			{ 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4 }, { 4, 4, 4, 4, 4, 4, 4, 4, 0, 4, 0, 0, 0, 0, 0, 4 },
+			{ 4, 1, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0, 0, 0, 4 }, { 4, 0, 0, 4, 0, 0, 0, 4, 0, 4, 0, 0, 0, 0, 0, 4 } };
 
 	private int tileSize = 32;
 
@@ -34,17 +49,45 @@ public class Level {
 		generateLevel();
 	}
 
-	@Deprecated
-	public int getLevelObject(int row, int col) {
-		return grid[row][col];
+	// private void loadLevel(String path) {
+	// InputStream inputStream = this.getClass().getResourceAsStream(path);
+	// BufferedReader reader = new BufferedReader(new
+	// InputStreamReader(inputStream));
+	//
+	// try {
+	// String line;
+	//
+	// while ((line = reader.readLine()) != null) {
+	// String[] tokens = line.split(",");
+	//
+	// }
+	// } catch (IOException e) {
+	// System.exit(1);
+	// }
+	// }
+
+	public Rectangle getBounds() {
+		return new Rectangle(0, 0, getColSize(), getRowSize());
 	}
 
-	public int getRowSize() {
+	public boolean contains(Rectangle rectangle) {
+		return getBounds().contains(rectangle);
+	}
+
+	public int getRowCount() {
 		return grid.length;
 	}
 
-	public int getColSize() {
+	public int getColCount() {
 		return grid[0].length;
+	}
+
+	public int getRowSize() {
+		return getRowCount() * tileSize;
+	}
+
+	public int getColSize() {
+		return getColCount() * tileSize;
 	}
 
 	public int getTileSize() {
@@ -55,10 +98,10 @@ public class Level {
 		for (int row = 0; row < grid.length; row++) {
 			for (int col = 0; col < grid[0].length; col++) {
 				if (grid[row][col] == 4) {
-					tiles.add(new WallTile(row, col, tileSize, textures, true));
+					tiles.add(new WallTile(row, col, tileSize, textures));
 				}
 				if (grid[row][col] == 1) {
-					tiles.add(new GoalTile(row, col, tileSize, textures, true));
+					tiles.add(new GoalTile(row, col, tileSize, textures));
 				}
 			}
 		}
@@ -72,23 +115,6 @@ public class Level {
 				return true;
 		}
 		return false;
-	}
-
-	@Deprecated
-	public boolean intersect(int row, int col) {
-		Tile tile;
-		for (int index = 0; index < tiles.size(); index++) {
-			tile = tiles.get(index);
-			if (inRange(row, tile.row * tile.tileSize, tile.row * tile.tileSize + tile.tileSize)
-					&& inRange(row, tile.col * tile.tileSize, tile.col * tile.tileSize + tile.tileSize))
-				return true;
-		}
-		return false;
-	}
-
-	@Deprecated
-	public boolean inRange(int value, int min, int max) {
-		return (value >= min) && (value <= max);
 	}
 
 	public void render(Graphics g) {

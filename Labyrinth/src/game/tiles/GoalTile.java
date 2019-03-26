@@ -6,8 +6,8 @@ import game.sprites.Textures;
 
 public class GoalTile extends Tile{
 
-	public GoalTile(int row, int col, int tileSize, Textures textures, boolean solid) {
-		super(row, col, tileSize, textures, TileType.GOAL, solid);
+	public GoalTile(int row, int col, int tileSize, Textures textures) {
+		super(row, col, tileSize, textures, TileType.GOAL);
 	}
 	
 	@Override

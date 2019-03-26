@@ -1,5 +1,5 @@
 package game.enums;
 
-public enum ShootDirection {
+public enum Direction {
 	UP, DOWN, LEFT, RIGHT
 }

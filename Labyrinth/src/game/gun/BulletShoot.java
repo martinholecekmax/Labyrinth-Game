@@ -3,15 +3,17 @@ package game.gun;
 import java.awt.Graphics;
 
 import game.engine.GameObject;
-import game.enums.ShootDirection;
+import game.engine.Level;
+import game.entities.Player;
+import game.enums.Direction;
 import game.sprites.Textures;
 
 public class BulletShoot extends GameObject implements IEntityBullets {
 	private Textures textures;
-	private ShootDirection direction;
+	private Direction direction;
 
-	public BulletShoot(int row, int col, Textures textures, ShootDirection direction) {
-		super(row, col);
+	public BulletShoot(Player player, Textures textures, Direction direction, Level level) {
+		super(player.row, player.col, level);
 		this.textures = textures;
 		this.direction = direction;
 	}
@@ -37,5 +39,6 @@ public class BulletShoot extends GameObject implements IEntityBullets {
 	@Override
 	public void render(Graphics g) {
 		g.drawImage(textures.missile, col, row, null);
+		g.drawRect(getBounds().x, getBounds().y, getBounds().width, getBounds().height);
 	}
 }

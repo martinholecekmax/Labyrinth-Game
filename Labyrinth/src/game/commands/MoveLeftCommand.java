@@ -5,7 +5,7 @@ import game.engine.GameWindow;
 public class MoveLeftCommand implements ICommand{
 
 	@Override
-	public void execute(GameWindow gameWindow) {
-		gameWindow.player.moveLeft();
+	public boolean execute(GameWindow gameWindow) {
+		return gameWindow.player.moveLeft(32);
 	}
 }

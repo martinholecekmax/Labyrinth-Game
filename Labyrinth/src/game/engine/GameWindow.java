@@ -9,6 +9,8 @@ import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import javax.swing.JTextArea;
+
 import game.commands.ICommand;
 import game.commands.MoveDownCommand;
 import game.commands.MoveLeftCommand;
@@ -22,8 +24,8 @@ import game.entities.EnemiesController;
 import game.entities.Enemy;
 import game.entities.IEntityEnemy;
 import game.entities.Player;
+import game.enums.Direction;
 import game.enums.GameState;
-import game.enums.ShootDirection;
 import game.enums.TileType;
 import game.gun.BulletController;
 import game.gun.BulletShoot;
@@ -51,16 +53,13 @@ public class GameWindow extends Canvas implements Runnable {
 	private GameFinish gameFinish;
 	private boolean movable;
 	private Queue<ICommand> commands;
-	
 	public Player player;
+	private JTextArea textMessage;
 
-	public GameWindow() {
+	public GameWindow(JTextArea textMessage) {
+		this.textMessage = textMessage;
 		loadTileSet();
 		commands = new LinkedList<ICommand>();
-
-		setPreferredSize(new Dimension(320, 320));
-		setMinimumSize(new Dimension(320, 320));
-		setMaximumSize(new Dimension(320, 320));
 
 		addKeyListener(new KeyInput(this));
 
@@ -76,6 +75,10 @@ public class GameWindow extends Canvas implements Runnable {
 		gameOver = new GameOver();
 		gameFinish = new GameFinish();
 		movable = true;
+		
+		setPreferredSize(new Dimension(level.getColSize(), level.getRowSize()));
+		setMinimumSize(new Dimension(level.getColSize(), level.getRowSize()));
+		setMaximumSize(new Dimension(level.getColSize(), level.getRowSize()));
 	}
 
 	private void loadTileSet() {
@@ -135,7 +138,9 @@ public class GameWindow extends Canvas implements Runnable {
 		if (!commands.isEmpty()) {
 			ICommand command = commands.poll();
 			if (command != null)
-				command.execute(this);
+				textMessage.setText("");
+				if(!command.execute(this))
+					textMessage.setText("Can't move there bro!");
 		}
 	}
 
@@ -213,8 +218,8 @@ public class GameWindow extends Canvas implements Runnable {
 		}
 	}
 
-	public void shoot(ShootDirection direction) {
-		IEntityBullets bullet = new BulletShoot(player.getRow(), player.getCol(), textures, direction);
+	public void shoot(Direction direction) {
+		IEntityBullets bullet = new BulletShoot(player, textures, direction, level);
 		bulletController.addBullet(bullet);
 	}
 }

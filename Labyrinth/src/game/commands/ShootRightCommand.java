@@ -1,12 +1,13 @@
 package game.commands;
 
 import game.engine.GameWindow;
-import game.enums.ShootDirection;
+import game.enums.Direction;
 
 public class ShootRightCommand implements ICommand{
 
 	@Override
-	public void execute(GameWindow gameWindow) {
-		gameWindow.shoot(ShootDirection.RIGHT);
+	public boolean execute(GameWindow gameWindow) {
+		gameWindow.shoot(Direction.RIGHT);
+		return true;
 	}
 }

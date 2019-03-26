@@ -5,7 +5,7 @@ import game.engine.GameWindow;
 public class MoveDownCommand implements ICommand{
 
 	@Override
-	public void execute(GameWindow gameWindow) {
-		gameWindow.player.moveDown();
+	public boolean execute(GameWindow gameWindow) {
+		return gameWindow.player.moveDown(32);
 	}
 }
