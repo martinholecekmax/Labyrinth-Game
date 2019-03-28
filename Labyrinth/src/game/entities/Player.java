@@ -1,17 +1,16 @@
 package game.entities;
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 
-import game.engine.GameObject;
 import game.engine.Level;
 import game.gun.IEntityBullets;
-import game.sprites.Textures;
 
-public class Player extends GameObject implements IEntityBullets {
-	private Textures textures;
+public class Player extends Entity implements IEntityBullets {
+	private BufferedImage texture;
 
-	public Player(int row, int col, Textures textures, Level level) {
+	public Player(int row, int col, BufferedImage textures, Level level) {
 		super(row, col, level);
-		this.textures = textures;
+		this.texture = textures;
 	}
 	
 	public void tick() {
@@ -19,6 +18,6 @@ public class Player extends GameObject implements IEntityBullets {
 	}
 
 	public void render(Graphics g) {
-		g.drawImage(textures.player, col, row, null);
+		g.drawImage(texture, col, row, null);
 	}
 }

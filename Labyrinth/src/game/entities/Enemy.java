@@ -1,22 +1,21 @@
 package game.entities;
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.util.Random;
 
-import game.engine.GameObject;
 import game.engine.Level;
-import game.sprites.Textures;
 
-public class Enemy extends GameObject implements IEntityEnemy {
+public class Enemy extends Entity implements IEntityEnemy {
 	private static final int STEPS = 1;
-	private Textures textures;
+	private BufferedImage texture;
 	private int direction = 0;
 	private boolean moveLeft = false;
 
 	private Random random = new Random();
 
-	public Enemy(int row, int col, Textures textures, Level level) {
+	public Enemy(int row, int col, BufferedImage textures, Level level) {
 		super(row, col, level);
-		this.textures = textures;
+		this.texture = textures;
 	}
 
 	public void tick() {
@@ -36,6 +35,6 @@ public class Enemy extends GameObject implements IEntityEnemy {
 	}
 
 	public void render(Graphics g) {
-		g.drawImage(textures.enemy, col, row, null);
+		g.drawImage(texture, col, row, null);
 	}
 }

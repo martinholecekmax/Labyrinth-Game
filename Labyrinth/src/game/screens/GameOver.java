@@ -3,6 +3,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 
+import game.utils.DrawSpecials;
+
 public class GameOver extends DrawSpecials{
 	public void render(Graphics g, int width, int height) {
 

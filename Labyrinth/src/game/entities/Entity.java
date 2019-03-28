@@ -1,18 +1,20 @@
-package game.engine;
+package game.entities;
 
 import java.awt.Rectangle;
 
-import game.enums.TileType;
+import game.engine.Level;
 
-public class GameObject {
+public class Entity {
 
 	public int row, col;
 	public Level level;
-
-	public GameObject(int row, int col, Level level) {
+	public boolean movable;
+	
+	public Entity(int row, int col, Level level) {
 		this.row = row;
 		this.col = col;
 		this.level = level;
+		movable = true;
 	}
 
 	public int getRow() {
@@ -29,7 +31,7 @@ public class GameObject {
 
 	public boolean moveUp(int steps) {
 		Rectangle rect = new Rectangle(col, row - steps, level.getTileSize(), level.getTileSize());
-		if (level.intersects(rect, TileType.WALL) == false && level.contains(rect)) {
+		if (level.intersectsSolid(rect) == false && level.contains(rect) && movable) {
 			row -= steps;
 			return true;
 		}
@@ -38,7 +40,7 @@ public class GameObject {
 
 	public boolean moveDown(int steps) {
 		Rectangle rect = new Rectangle(col, row + steps, level.getTileSize(), level.getTileSize());
-		if (level.intersects(rect, TileType.WALL) == false && level.contains(rect)) {
+		if (level.intersectsSolid(rect) == false && level.contains(rect) && movable) {
 			row += steps;
 			return true;
 		}
@@ -47,7 +49,7 @@ public class GameObject {
 
 	public boolean moveRight(int steps) {
 		Rectangle rect = new Rectangle(col + steps, row, level.getTileSize(), level.getTileSize());
-		if (level.intersects(rect, TileType.WALL) == false && level.contains(rect)) {
+		if (level.intersectsSolid(rect) == false && level.contains(rect) && movable) {
 			col += steps;
 			return true;
 		}
@@ -56,10 +58,14 @@ public class GameObject {
 
 	public boolean moveLeft(int steps) {
 		Rectangle rect = new Rectangle(col - steps, row, level.getTileSize(), level.getTileSize());
-		if (level.intersects(rect, TileType.WALL) == false && level.contains(rect)) {
+		if (level.intersectsSolid(rect) == false && level.contains(rect) && movable) {
 			col -= steps;
 			return true;
 		}
 		return false;
+	}
+	
+	public void setMovable(boolean movable) {
+		this.movable = movable;
 	}
 }

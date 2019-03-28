@@ -1,4 +1,4 @@
-package game.engine;
+package game.utils;
 
 import java.awt.Color;
 import java.awt.Dimension;

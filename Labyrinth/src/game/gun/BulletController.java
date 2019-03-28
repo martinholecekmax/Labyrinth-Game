@@ -1,17 +1,16 @@
 package game.gun;
 
 import java.awt.Graphics;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import game.engine.Level;
 import game.engine.Physics;
 import game.entities.IEntityEnemy;
-import game.enums.TileType;
 
-public class BulletController {
+public class BulletController implements Iterable<IEntityBullets>{
 	private LinkedList<IEntityBullets> bullets = new LinkedList<IEntityBullets>();
 
-	IEntityBullets bullet;
 	Level level;
 
 	public BulletController(Level level) {
@@ -19,23 +18,18 @@ public class BulletController {
 	}
 
 	public void tick() {
-		for (int index = 0; index < bullets.size(); index++) {
-			bullet = bullets.get(index);
+		for (IEntityBullets bullet : bullets) {
 			bullet.tick();
-//			if (bullet.getCol() > level.getColSize() || bullet.getCol() < 0
-//					|| bullet.getRow() > level.getRowSize() || bullet.getRow() < 0)
-//				removeBullet(bullet);
 			if(!level.contains(bullet.getBounds()))
 				removeBullet(bullet);
-				
-			if (level.intersects(bullet.getBounds(), TileType.WALL))
+			else if (level.intersectsSolid(bullet.getBounds()))
 				removeBullet(bullet);
 		}
 	}
 
 	public void render(Graphics g) {
-		for (int index = 0; index < bullets.size(); index++) {
-			bullets.get(index).render(g);
+		for (IEntityBullets bullet : bullets) {
+			bullet.render(g);
 		}
 	}
 
@@ -53,13 +47,17 @@ public class BulletController {
 
 	public boolean collision(IEntityEnemy enemy) {
 		boolean hit = false;
-		for (int index = 0; index < bullets.size(); index++) {
-			bullet = bullets.get(index);
+		for (IEntityBullets bullet : bullets) {
 			if (Physics.Collision(bullet, enemy)) {
 				bullets.remove(bullet);
 				hit = true;
 			}
 		}
 		return hit;
+	}
+
+	@Override
+	public Iterator<IEntityBullets> iterator() {
+		return bullets.iterator();
 	}
 }

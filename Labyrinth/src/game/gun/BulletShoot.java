@@ -2,13 +2,13 @@ package game.gun;
 
 import java.awt.Graphics;
 
-import game.engine.GameObject;
 import game.engine.Level;
+import game.entities.Entity;
 import game.entities.Player;
 import game.enums.Direction;
 import game.sprites.Textures;
 
-public class BulletShoot extends GameObject implements IEntityBullets {
+public class BulletShoot extends Entity implements IEntityBullets {
 	private Textures textures;
 	private Direction direction;
 

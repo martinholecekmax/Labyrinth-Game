@@ -6,79 +6,86 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Queue;
-
-import javax.swing.JTextArea;
 
 import game.commands.ICommand;
-import game.commands.MoveDownCommand;
-import game.commands.MoveLeftCommand;
-import game.commands.MoveRightCommand;
-import game.commands.MoveUpCommand;
-import game.commands.ShootDownCommand;
-import game.commands.ShootLeftCommand;
-import game.commands.ShootRightCommand;
-import game.commands.ShootUpCommand;
+import game.commands.MoveCommand;
+import game.commands.ShootCommand;
 import game.entities.EnemiesController;
-import game.entities.Enemy;
 import game.entities.IEntityEnemy;
 import game.entities.Player;
 import game.enums.Direction;
+import game.enums.GameObjectType;
 import game.enums.GameState;
-import game.enums.TileType;
 import game.gun.BulletController;
 import game.gun.BulletShoot;
-import game.gun.IEntityBullets;
 import game.screens.GameFinish;
 import game.screens.GameOver;
-import game.sprites.Background;
 import game.sprites.BufferedImageLoader;
 import game.sprites.Textures;
 
 public class GameWindow extends Canvas implements Runnable {
 
 	private static final long serialVersionUID = 1L;
+	private static final int UPS = 60;
+	private static final int FPS = 60;
+	private static final boolean RENDER_TIME = false;
+
 	private boolean running = false;
 	private Thread thread;
 	private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 	private BufferedImage spriteSheet = null;
-	private Background background;
 	private BulletController bulletController;
 	private Level level;
 	private Textures textures;
-	private EnemiesController enemiesController;
 	private GameState gameState = GameState.GAME;
 	private GameOver gameOver;
 	private GameFinish gameFinish;
-	private boolean movable;
-	private Queue<ICommand> commands;
-	public Player player;
-	private JTextArea textMessage;
+	private boolean keyInputMovable;
+	private LinkedList<ICommand> commands;
 
-	public GameWindow(JTextArea textMessage) {
-		this.textMessage = textMessage;
+	protected Player player;
+	protected EnemiesController enemiesController;
+
+	private GameEngine gameEngine;
+
+	public Player getPlayer() {
+		return player;
+	}
+	
+	public void setKeyInputMovable(boolean keyInputMovable) {
+		this.keyInputMovable = keyInputMovable;
+	}
+
+	public GameWindow(GameEngine gameEngine, String mapFilePath) {
+		this.gameEngine = gameEngine;
 		loadTileSet();
-		commands = new LinkedList<ICommand>();
 
 		addKeyListener(new KeyInput(this));
-
+		commands = new LinkedList<ICommand>();
 		textures = new Textures(spriteSheet);
-
-		level = new Level(textures);
-		player = new Player(0, 0, textures, level);
-		bulletController = new BulletController(level);
 		enemiesController = new EnemiesController();
-		enemiesController.addEnemy(new Enemy(6 * 32, 8 * 32, textures, level));
-		enemiesController.addEnemy(new Enemy(4 * 32, 8 * 32, textures, level));
-		background = new Background(textures, level);
+		level = new Level(textures);
+		bulletController = new BulletController(level);
 		gameOver = new GameOver();
 		gameFinish = new GameFinish();
-		movable = true;
-		
+		keyInputMovable = true;
+		initGame(mapFilePath);
+	}
+
+	public void initGame(String mapFilePath) {
+		level.setLevel(this, level.loadLevel(mapFilePath));
 		setPreferredSize(new Dimension(level.getColSize(), level.getRowSize()));
 		setMinimumSize(new Dimension(level.getColSize(), level.getRowSize()));
 		setMaximumSize(new Dimension(level.getColSize(), level.getRowSize()));
+	}
+
+	public void restartGame() {
+		level.clearLevel();
+		commands.clear();
+		enemiesController.clear();
+		bulletController.getBulletsList().clear();
 	}
 
 	private void loadTileSet() {
@@ -110,17 +117,57 @@ public class GameWindow extends Canvas implements Runnable {
 		}
 	}
 
+	@Override
 	public void run() {
+
+		long initialTime = System.nanoTime();
+		final double timeU = 1000000000 / UPS;
+		final double timeF = 1000000000 / FPS;
+		double deltaU = 0, deltaF = 0;
+		int frames = 0, ticks = 0;
+		long timer = System.currentTimeMillis();
+
 		while (running) {
-			tick();
-			render();
-			try {
-				Thread.sleep(20);
-			} catch (Exception e) {
+
+			long currentTime = System.nanoTime();
+			deltaU += (currentTime - initialTime) / timeU;
+			deltaF += (currentTime - initialTime) / timeF;
+			initialTime = currentTime;
+
+			if (deltaU >= 1) {
+				tick();
+				ticks++;
+				deltaU--;
+			}
+
+			if (deltaF >= 1) {
+				render();
+				frames++;
+				deltaF--;
+			}
+
+			if (System.currentTimeMillis() - timer > 1000) {
+				if (RENDER_TIME) {
+					System.out.println(String.format("UPS: %s, FPS: %s", ticks, frames));
+				}
+				frames = 0;
+				ticks = 0;
+				timer += 1000;
 			}
 		}
-		stop();
 	}
+
+//	public void run() {
+//		while (running) {
+//			tick();
+//			render();
+//			try {
+//				Thread.sleep(20);
+//			} catch (Exception e) {
+//			}
+//		}
+//		stop();
+//	}
 
 	private void tick() {
 		if (gameState == GameState.GAME) {
@@ -138,23 +185,26 @@ public class GameWindow extends Canvas implements Runnable {
 		if (!commands.isEmpty()) {
 			ICommand command = commands.poll();
 			if (command != null)
-				textMessage.setText("");
-				if(!command.execute(this))
-					textMessage.setText("Can't move there bro!");
+				setMessage("");
+			if (!command.execute(this))
+				setMessage("Can't move there bro!");
 		}
 	}
 
 	private void collision() {
-		LinkedList<IEntityEnemy> enemies = enemiesController.getAllEnemies();
-		for (int index = 0; index < enemies.size(); index++) {
-			if (bulletController.collision(enemies.get(index))) {
-				enemiesController.removeEnemy(enemies.get(index));
+		Iterator<IEntityEnemy> iter = enemiesController.iterator();
+
+		while (iter.hasNext()) {
+		    IEntityEnemy enemy = iter.next();
+
+		    if (Physics.Collision(player, enemy)) {
+				gameState = GameState.OVER;
+			}
+			if (bulletController.collision(enemy)) {
+				iter.remove();
 			}
 		}
-		if (Physics.Collision(player, enemiesController.getAllEnemies())) {
-			gameState = GameState.OVER;
-		}
-		if (level.intersects(player.getBounds(), TileType.GOAL)) {
+		if (level.intersects(player.getBounds(), GameObjectType.GOAL)) {
 			gameState = GameState.FINISH;
 		}
 	}
@@ -173,7 +223,6 @@ public class GameWindow extends Canvas implements Runnable {
 
 		g.drawImage(image, 0, 0, getWidth(), getHeight(), this);
 
-		background.render(g);
 		level.render(g);
 		player.render(g);
 		bulletController.render(g);
@@ -196,30 +245,33 @@ public class GameWindow extends Canvas implements Runnable {
 	}
 
 	public void keyPressed(KeyEvent e) {
-		if (gameState == GameState.GAME && movable) {
+		if (gameState == GameState.GAME && keyInputMovable) {
 			int key = e.getKeyCode();
 			if (key == KeyEvent.VK_RIGHT) {
-				commands.add(new MoveRightCommand());
+				commands.add(new MoveCommand(Direction.RIGHT));
 			} else if (key == KeyEvent.VK_LEFT) {
-				commands.add(new MoveLeftCommand());
+				commands.add(new MoveCommand(Direction.LEFT));
 			} else if (key == KeyEvent.VK_UP) {
-				commands.add(new MoveUpCommand());
+				commands.add(new MoveCommand(Direction.UP));
 			} else if (key == KeyEvent.VK_DOWN) {
-				commands.add(new MoveDownCommand());
+				commands.add(new MoveCommand(Direction.DOWN));
 			} else if (key == KeyEvent.VK_A) {
-				commands.add(new ShootLeftCommand());
+				commands.add(new ShootCommand(Direction.LEFT));
 			} else if (key == KeyEvent.VK_D) {
-				commands.add(new ShootRightCommand());
+				commands.add(new ShootCommand(Direction.RIGHT));
 			} else if (key == KeyEvent.VK_W) {
-				commands.add(new ShootUpCommand());
+				commands.add(new ShootCommand(Direction.UP));
 			} else if (key == KeyEvent.VK_S) {
-				commands.add(new ShootDownCommand());
+				commands.add(new ShootCommand(Direction.DOWN));
 			}
 		}
 	}
 
 	public void shoot(Direction direction) {
-		IEntityBullets bullet = new BulletShoot(player, textures, direction, level);
-		bulletController.addBullet(bullet);
+		bulletController.addBullet(new BulletShoot(player, textures, direction, level));
+	}
+
+	public synchronized void setMessage(String message) {
+		gameEngine.setMessage(message);
 	}
 }

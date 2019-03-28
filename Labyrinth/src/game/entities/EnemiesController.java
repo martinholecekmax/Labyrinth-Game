@@ -1,41 +1,45 @@
 package game.entities;
+
 import java.awt.Graphics;
+import java.util.Iterator;
 import java.util.LinkedList;
 
-public class EnemiesController {
+public class EnemiesController implements Iterable<IEntityEnemy> {
 	private LinkedList<IEntityEnemy> enemies = new LinkedList<IEntityEnemy>();
 
-	IEntityEnemy enemy;
 	private int enemyKilled = 0;
-	
-	
+
 	public int getEnemyKilled() {
 		return enemyKilled;
 	}
 
 	public void tick() {
-		for (int index = 0; index < enemies.size(); index++) {
-			enemy = enemies.get(index);
+		for (IEntityEnemy enemy : enemies) {
 			enemy.tick();
 		}
 	}
 
 	public void render(Graphics g) {
-		for (int index = 0; index < enemies.size(); index++) {
-			enemies.get(index).render(g);
+		for (IEntityEnemy enemy : enemies) {
+			enemy.render(g);
 		}
 	}
 
-	public void addEnemy(IEntityEnemy block) {
-		enemies.add(block);
+	public void addEnemy(IEntityEnemy enemy) {
+		enemies.add(enemy);
 	}
 
-	public void removeEnemy(IEntityEnemy block) {
-		enemies.remove(block);
+	public synchronized void removeEnemy(IEntityEnemy enemy) {
+		enemies.remove(enemy);
 		enemyKilled++;
 	}
-	
-	public LinkedList<IEntityEnemy> getAllEnemies(){
-		return enemies;
+
+	public void clear() {
+		enemies.clear();
+	}
+
+	@Override
+	public Iterator<IEntityEnemy> iterator() {
+		return enemies.iterator();
 	}
 }
