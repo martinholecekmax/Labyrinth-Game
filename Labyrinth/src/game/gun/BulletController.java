@@ -1,15 +1,17 @@
 package game.gun;
 
 import java.awt.Graphics;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import game.engine.Level;
 import game.engine.Physics;
 import game.entities.IEntityEnemy;
 
 public class BulletController implements Iterable<IEntityBullets>{
-	private LinkedList<IEntityBullets> bullets = new LinkedList<IEntityBullets>();
+	private List<IEntityBullets> bullets = Collections.synchronizedList(new LinkedList<IEntityBullets>());
 
 	Level level;
 
@@ -41,7 +43,7 @@ public class BulletController implements Iterable<IEntityBullets>{
 		bullets.remove(block);
 	}
 
-	public LinkedList<IEntityBullets> getBulletsList() {
+	public List<IEntityBullets> getBulletsList() {
 		return bullets;
 	}
 

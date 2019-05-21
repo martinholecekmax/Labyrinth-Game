@@ -9,7 +9,7 @@ public class Entity {
 	public int row, col;
 	public Level level;
 	public boolean movable;
-	
+
 	public Entity(int row, int col, Level level) {
 		this.row = row;
 		this.col = col;
@@ -64,7 +64,7 @@ public class Entity {
 		}
 		return false;
 	}
-	
+
 	public void setMovable(boolean movable) {
 		this.movable = movable;
 	}

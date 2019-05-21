@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -24,8 +25,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import game.commands.KeyboardInputCommand;
+import game.commands.ICommand;
 import game.utils.TextLineNumber;
+import interpreter.ExceptionSemantic;
+import interpreter.Interpreter;
+import parser.ast.ParseException;
+import parser.ast.TokenMgrError;
 
 public class GameEngine implements ActionListener {
 
@@ -34,26 +39,31 @@ public class GameEngine implements ActionListener {
 	private JPanel splitPane;
 	private JPanel panelRight;
 	private JPanel panelRightBottom;
-	private JButton btnGo;
-	private JTextArea textAreaProgram;
-	private JScrollPane scrollPaneProgram;
+	private JPanel panelGame;
 	private JMenuBar menuBar;
 	private JMenu mnFile;
 	private JMenuItem mntmLoadProgramFile;
-	private JFileChooser fileChooser;
-	private JTextArea textMessage;
-	private JScrollPane scrollPaneMessage;
-	private GameWindow gameWindow;
-	private JPanel panelGame;
-	private int numLines;
 	private JMenuItem mntmLoadMapFile;
+	private JTextArea textAreaProgram;
+	private JTextArea textMessage;
+	private JScrollPane scrollPaneProgram;
+	private JFileChooser fileChooser;
+	private JScrollPane scrollPaneMessage;
+	private JButton btnGo;
 	private FileNameExtensionFilter fileProgramFilter;
 	private FileNameExtensionFilter fileMapFilter;
 	private String mapFilePath = "/map.csv";
+	private String questionsPath = "/questions.csv";
+	private GameWindow gameWindow;
+	private int numLines;
 
 //	private static final int WIDTH = 480;
 //	private static final int HEIGHT = WIDTH / 12 * 9;
 //	private static final int SCALE = 2;
+
+	public int getNumLines() {
+		return numLines;
+	}
 
 	public GameEngine() {
 
@@ -97,7 +107,7 @@ public class GameEngine implements ActionListener {
 		textMessage.setRows(5);
 		textMessage.setBorder(title);
 
-		gameWindow = new GameWindow(this, mapFilePath);
+		gameWindow = new GameWindow(this, mapFilePath, questionsPath);
 		panelGame = new JPanel(new GridLayout(1, 1));
 		panelGame.setPreferredSize(gameWindow.getPreferredSize());
 		panelGame.setMinimumSize(gameWindow.getMinimumSize());
@@ -182,23 +192,24 @@ public class GameEngine implements ActionListener {
 		String text = textAreaProgram.getText();
 		String[] textLines = text.trim().split("\n");
 		numLines += textLines.length;
-		System.out.println("Num Lines: "+ numLines);
-		
-		if (text.contentEquals("a")) {
-			gameWindow.addCommand(new KeyboardInputCommand(false));
-		} else {
-			gameWindow.addCommand(new KeyboardInputCommand(true));
+		ArrayList<ICommand> done;
+		try {
+			textMessage.setText("");
+			done = Interpreter.parse(text);
+			for (ICommand command : done) {
+				gameWindow.addCommand(command);
+			}
+		} catch (ParseException parseError) {
+			textMessage.setText(parseError.getMessage());
+		} catch (TokenMgrError tokenError) {
+			textMessage.setText(tokenError.getMessage());
+		} catch (ExceptionSemantic semanticError) {
+			textMessage.setText(semanticError.getMessage());
 		}
-//		gameWindow.addCommand(new MoveCommand(Direction.RIGHT));s
-//		gameWindow.addCommand(new QuitGameCommand());
-		// TODO Connect parser
-
-		// ArrayList<commands> commands = parser.parse(text)
 	}
 
 	public void setMessage(String text) {
 		SwingUtilities.invokeLater(new Runnable() {
-			@Override
 			public void run() {
 				textMessage.setText(text);
 			}

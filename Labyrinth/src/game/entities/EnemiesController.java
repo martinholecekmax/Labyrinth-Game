@@ -1,21 +1,41 @@
 package game.entities;
 
 import java.awt.Graphics;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 public class EnemiesController implements Iterable<IEntityEnemy> {
-	private LinkedList<IEntityEnemy> enemies = new LinkedList<IEntityEnemy>();
+	private List<IEntityEnemy> enemies = Collections.synchronizedList(new LinkedList<IEntityEnemy>());
 
 	private int enemyKilled = 0;
+	private boolean freeze = false;
+	private int freezeInterval = 10000;
+	private long freezeTimer = System.currentTimeMillis();
+	
+	public void setFreeze(boolean freeze) {
+		this.freeze = freeze;
+		freezeTimer = System.currentTimeMillis();
+	}
+
+	public void setFreezeInterval(int freezeInterval) {
+		this.freezeInterval = freezeInterval;
+	}
 
 	public int getEnemyKilled() {
 		return enemyKilled;
 	}
 
 	public void tick() {
-		for (IEntityEnemy enemy : enemies) {
-			enemy.tick();
+		if (!freeze) {
+			for (IEntityEnemy enemy : enemies) {
+				enemy.tick();
+			}
+		} else {
+			if (System.currentTimeMillis() - freezeTimer > freezeInterval) {
+				freeze = false;
+			}
 		}
 	}
 
@@ -29,9 +49,8 @@ public class EnemiesController implements Iterable<IEntityEnemy> {
 		enemies.add(enemy);
 	}
 
-	public synchronized void removeEnemy(IEntityEnemy enemy) {
+	public void removeEnemy(IEntityEnemy enemy) {
 		enemies.remove(enemy);
-		enemyKilled++;
 	}
 
 	public void clear() {
@@ -41,5 +60,9 @@ public class EnemiesController implements Iterable<IEntityEnemy> {
 	@Override
 	public Iterator<IEntityEnemy> iterator() {
 		return enemies.iterator();
+	}
+
+	public void increaseKilled() {
+		enemyKilled++;
 	}
 }

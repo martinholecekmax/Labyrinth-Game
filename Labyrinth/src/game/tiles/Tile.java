@@ -13,7 +13,7 @@ public class Tile {
 	private boolean solid;
 	private int tileSize;
 	private GameObjectType tileType;
-
+	
 	public Tile(int row, int col, int tileSize, BufferedImage texture, GameObjectType tileType, boolean solid) {
 		this.row = row;
 		this.col = col;

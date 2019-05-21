@@ -12,6 +12,7 @@ import game.entities.Enemy;
 import game.entities.Player;
 import game.enums.GameObjectType;
 import game.sprites.Textures;
+import game.tiles.Door;
 import game.tiles.Tile;
 
 public class Level {
@@ -24,8 +25,9 @@ public class Level {
 	private ArrayList<Tile> tiles;
 	private int rowCount;
 	private int colCount;
+	private QuestionPool questionPool;
 
-	public Level(Textures textures) {
+	public Level(Textures textures, String questionPath) {
 		this.textures = textures;
 		tiles = new ArrayList<Tile>();
 	}
@@ -46,18 +48,23 @@ public class Level {
 			System.out.println("Error reading the file!");
 			System.exit(1);
 			return null;
-		} 
+		}
 	}
-	
+
+	public void createQuestionPool(String path) {
+		questionPool = new QuestionPool(path);
+	}
+
 	public void setLevel(GameWindow gameWindow, ArrayList<String> lines) {
 		rowCount = lines.size();
 		String[] tokens = lines.get(0).split(",");
 		colCount = tokens.length;
-		
+
 		int type = 0;
 		for (int row = 0; row < lines.size(); row++) {
 			tokens = lines.get(row).split(",");
-			if (tokens.length != colCount) throw new ArrayIndexOutOfBoundsException("Map must have all rows same size!");
+			if (tokens.length != colCount)
+				throw new ArrayIndexOutOfBoundsException("Map must have all rows same size!");
 			for (int col = 0; col < colCount; col++) {
 				type = Integer.parseInt(tokens[col].trim());
 				tiles.add(new Tile(row, col, tileSize, textures.background, GameObjectType.BACKGROUND, false));
@@ -72,6 +79,9 @@ public class Level {
 				} else if (type == GameObjectType.ENEMY.getNumVal()) {
 					gameWindow.enemiesController
 							.addEnemy(new Enemy(row * tileSize, col * tileSize, textures.enemy, this));
+				} else if (type == GameObjectType.DOOR.getNumVal()) {
+					tiles.add(new Door(row, col, tileSize, textures.door, GameObjectType.DOOR, false,
+							questionPool.getRandomQuestion()));
 				}
 			}
 		}
@@ -110,6 +120,16 @@ public class Level {
 
 	public void clearLevel() {
 		tiles.clear();
+	}
+
+	public Tile getTile(Rectangle bounds, GameObjectType tileType) {
+		Tile tile;
+		for (int index = 0; index < tiles.size(); index++) {
+			tile = tiles.get(index);
+			if (tile.getBounds().intersects(bounds) && tile.getTileType() == tileType)
+				return tile;
+		}
+		return null;
 	}
 
 	public boolean intersects(Rectangle bounds, GameObjectType tileType) {

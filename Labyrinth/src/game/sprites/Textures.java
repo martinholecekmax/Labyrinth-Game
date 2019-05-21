@@ -11,6 +11,7 @@ public class Textures {
 	public BufferedImage background;
 	public BufferedImage wall;
 	public BufferedImage goal;
+	public BufferedImage door;
 
 	public Textures(BufferedImage spriteSheet) {
 		this.spriteSheet = new SpriteSheet(spriteSheet);
@@ -24,5 +25,6 @@ public class Textures {
 		enemy = spriteSheet.grabImage(2, 4, 32, 32);
 		wall = spriteSheet.grabImage(1, 15, 32, 32);
 		goal = spriteSheet.grabImage(24, 13, 32, 32);
+		door = spriteSheet.grabImage(24, 12, 32, 32);
 	}
 }

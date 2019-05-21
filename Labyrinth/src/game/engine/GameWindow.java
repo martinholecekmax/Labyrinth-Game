@@ -11,6 +11,7 @@ import java.util.LinkedList;
 
 import game.commands.ICommand;
 import game.commands.MoveCommand;
+import game.commands.OpenDoorCommand;
 import game.commands.ShootCommand;
 import game.entities.EnemiesController;
 import game.entities.IEntityEnemy;
@@ -20,10 +21,12 @@ import game.enums.GameObjectType;
 import game.enums.GameState;
 import game.gun.BulletController;
 import game.gun.BulletShoot;
+import game.screens.DialogBoxMessage;
 import game.screens.GameFinish;
 import game.screens.GameOver;
 import game.sprites.BufferedImageLoader;
 import game.sprites.Textures;
+import game.tiles.Door;
 
 public class GameWindow extends Canvas implements Runnable {
 
@@ -43,6 +46,12 @@ public class GameWindow extends Canvas implements Runnable {
 	private GameOver gameOver;
 	private GameFinish gameFinish;
 	private boolean keyInputMovable;
+	private boolean freeze = false;
+	private boolean dialog = false;
+
+	private long processCommandsTimer = System.currentTimeMillis();
+	private DialogBoxMessage questionMessage;
+
 	private LinkedList<ICommand> commands;
 
 	protected Player player;
@@ -53,12 +62,12 @@ public class GameWindow extends Canvas implements Runnable {
 	public Player getPlayer() {
 		return player;
 	}
-	
+
 	public void setKeyInputMovable(boolean keyInputMovable) {
 		this.keyInputMovable = keyInputMovable;
 	}
 
-	public GameWindow(GameEngine gameEngine, String mapFilePath) {
+	public GameWindow(GameEngine gameEngine, String mapFilePath, String questionsPath) {
 		this.gameEngine = gameEngine;
 		loadTileSet();
 
@@ -66,23 +75,25 @@ public class GameWindow extends Canvas implements Runnable {
 		commands = new LinkedList<ICommand>();
 		textures = new Textures(spriteSheet);
 		enemiesController = new EnemiesController();
-		level = new Level(textures);
+		level = new Level(textures, questionsPath);
 		bulletController = new BulletController(level);
 		gameOver = new GameOver();
 		gameFinish = new GameFinish();
 		keyInputMovable = true;
-		initGame(mapFilePath);
+		initGame(mapFilePath, questionsPath);
 	}
 
-	public void initGame(String mapFilePath) {
+	public void initGame(String mapFilePath, String questionsPath) {
+		level.createQuestionPool(questionsPath);
 		level.setLevel(this, level.loadLevel(mapFilePath));
 		setPreferredSize(new Dimension(level.getColSize(), level.getRowSize()));
 		setMinimumSize(new Dimension(level.getColSize(), level.getRowSize()));
 		setMaximumSize(new Dimension(level.getColSize(), level.getRowSize()));
 	}
 
-	public void restartGame() {
+	public void restartGame(String mapFilePath) {
 		level.clearLevel();
+		level.setLevel(this, level.loadLevel(mapFilePath));
 		commands.clear();
 		enemiesController.clear();
 		bulletController.getBulletsList().clear();
@@ -157,37 +168,30 @@ public class GameWindow extends Canvas implements Runnable {
 		}
 	}
 
-//	public void run() {
-//		while (running) {
-//			tick();
-//			render();
-//			try {
-//				Thread.sleep(20);
-//			} catch (Exception e) {
-//			}
-//		}
-//		stop();
-//	}
-
 	private void tick() {
-		if (gameState == GameState.GAME) {
+		if (gameState == GameState.GAME && !freeze) {
 			player.tick();
 			bulletController.tick();
 			enemiesController.tick();
 			collision();
-			processCommand();
 		} else if (gameState == GameState.OVER) {
 
 		}
+		processCommand();
 	}
 
 	private void processCommand() {
-		if (!commands.isEmpty()) {
+		if (!commands.isEmpty() && System.currentTimeMillis() - processCommandsTimer > 300) {
 			ICommand command = commands.poll();
+			if (freeze && !(command instanceof OpenDoorCommand)) {
+				setMessage("You shall not pass! You must answer the question first!");
+				return;
+			}
 			if (command != null)
 				setMessage("");
 			if (!command.execute(this))
 				setMessage("Can't move there bro!");
+			processCommandsTimer = System.currentTimeMillis();
 		}
 	}
 
@@ -195,17 +199,29 @@ public class GameWindow extends Canvas implements Runnable {
 		Iterator<IEntityEnemy> iter = enemiesController.iterator();
 
 		while (iter.hasNext()) {
-		    IEntityEnemy enemy = iter.next();
+			IEntityEnemy enemy = iter.next();
 
-		    if (Physics.Collision(player, enemy)) {
+			if (Physics.Collision(player, enemy)) {
 				gameState = GameState.OVER;
 			}
 			if (bulletController.collision(enemy)) {
+				enemiesController.increaseKilled();
 				iter.remove();
 			}
 		}
+
 		if (level.intersects(player.getBounds(), GameObjectType.GOAL)) {
 			gameState = GameState.FINISH;
+		}
+
+		if (level.intersects(player.getBounds(), GameObjectType.DOOR)) {
+			Door door = (Door) level.getTile(player.getBounds(), GameObjectType.DOOR);
+			if (door != null && door.isOpened() == false) {
+				questionMessage = new DialogBoxMessage(door.getQuesetion());
+				player.setMovable(false);
+				freeze = true;
+				dialog = true;
+			}
 		}
 	}
 
@@ -231,7 +247,13 @@ public class GameWindow extends Canvas implements Runnable {
 		if (gameState == GameState.OVER) {
 			gameOver.render(g, getWidth(), getHeight());
 		} else if (gameState == GameState.FINISH) {
-			gameFinish.render(g, getWidth(), getHeight(), enemiesController.getEnemyKilled());
+			int score = 10000 - gameEngine.getNumLines();
+			score = score * enemiesController.getEnemyKilled();
+			gameFinish.render(g, getWidth(), getHeight(), score);
+		}
+
+		if (dialog) {
+			questionMessage.render(g, getWidth(), getHeight());
 		}
 
 		//////////////////////////////////////
@@ -273,5 +295,23 @@ public class GameWindow extends Canvas implements Runnable {
 
 	public synchronized void setMessage(String message) {
 		gameEngine.setMessage(message);
+	}
+
+	public void freezeEnemies() {
+		enemiesController.setFreeze(true);
+	}
+
+	public void openDoor(String answer) {
+		Door door = (Door) level.getTile(player.getBounds(), GameObjectType.DOOR);
+		if (door != null) {
+			if (door.checkAnswer(answer)) {
+				door.setOpened(true);
+				player.setMovable(true);
+				freeze = false;
+				dialog = false;
+			} else {
+				setMessage("Wrong Answer! Try Again!");
+			}
+		}
 	}
 }
