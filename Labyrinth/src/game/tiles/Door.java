@@ -9,10 +9,14 @@ public class Door extends Tile{
 	
 	private boolean opened = false;
 	private Question quesetion;
+	private BufferedImage openedDoorTexture;
+	private BufferedImage closedDoorTexture;
 	
-	public Door(int row, int col, int tileSize, BufferedImage texture, GameObjectType tileType, boolean solid, Question question) {
-		super(row, col, tileSize, texture, tileType, solid);
+	public Door(int row, int col, int tileSize, BufferedImage openedDoorTexture, BufferedImage closedDoorTexture, GameObjectType tileType, boolean solid, Question question) {
+		super(row, col, tileSize, closedDoorTexture, tileType, solid);
 		this.quesetion = question;
+		this.openedDoorTexture = openedDoorTexture;
+		this.closedDoorTexture = closedDoorTexture;
 	}
 
 	public Question getQuesetion() {
@@ -25,6 +29,11 @@ public class Door extends Tile{
 
 	public void setOpened(boolean opened) {
 		this.opened = opened;
+		if (opened) {
+			setTexture(openedDoorTexture);
+		} else {
+			setTexture(closedDoorTexture);
+		}
 	}
 	
 	public boolean checkAnswer(String answer) {

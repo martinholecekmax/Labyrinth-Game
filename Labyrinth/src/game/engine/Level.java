@@ -3,9 +3,9 @@ package game.engine;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 import game.entities.Enemy;
@@ -32,17 +32,17 @@ public class Level {
 		tiles = new ArrayList<Tile>();
 	}
 
-	public ArrayList<String> loadLevel(String path) {
-		InputStream inputStream = this.getClass().getResourceAsStream(path);
-		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+	public ArrayList<String> loadLevel(File file) {
 
 		try {
+			BufferedReader reader = new BufferedReader(new FileReader(file));
 			ArrayList<String> allLines = new ArrayList<String>();
 			String line = reader.readLine();
 			while (line != null) {
 				allLines.add(line);
 				line = reader.readLine();
 			}
+			reader.close();
 			return allLines;
 		} catch (IOException e) {
 			System.out.println("Error reading the file!");
@@ -80,8 +80,8 @@ public class Level {
 					gameWindow.enemiesController
 							.addEnemy(new Enemy(row * tileSize, col * tileSize, textures.enemy, this));
 				} else if (type == GameObjectType.DOOR.getNumVal()) {
-					tiles.add(new Door(row, col, tileSize, textures.door, GameObjectType.DOOR, false,
-							questionPool.getRandomQuestion()));
+					tiles.add(new Door(row, col, tileSize, textures.doorOpened, textures.doorClosed,
+							GameObjectType.DOOR, false, questionPool.getRandomQuestion()));
 				}
 			}
 		}
@@ -119,6 +119,8 @@ public class Level {
 	}
 
 	public void clearLevel() {
+		isGoalCreated = false;
+		isPlayerCreated = false;
 		tiles.clear();
 	}
 

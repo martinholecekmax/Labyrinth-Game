@@ -1,3 +1,5 @@
+// Test of the functions, if and write
+
 fn sum(n) {
    if (n > 0)
       	p = n + sum(n - 1)
@@ -7,4 +9,3 @@ fn sum(n) {
 }
 
 write sum(25)
-write "hello boss"

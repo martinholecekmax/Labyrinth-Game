@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -31,33 +32,28 @@ import game.tiles.Door;
 public class GameWindow extends Canvas implements Runnable {
 
 	private static final long serialVersionUID = 1L;
-	private static final int UPS = 60;
 	private static final int FPS = 60;
-	private static final boolean RENDER_TIME = false;
 
+	private long processCommandsTimer = System.currentTimeMillis();
 	private boolean running = false;
+	private boolean keyInputMovable;
+	private boolean freeze = false;
+	private boolean dialog = false;
 	private Thread thread;
 	private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 	private BufferedImage spriteSheet = null;
 	private BulletController bulletController;
 	private Level level;
 	private Textures textures;
+	private GameEngine gameEngine;
 	private GameState gameState = GameState.GAME;
 	private GameOver gameOver;
 	private GameFinish gameFinish;
-	private boolean keyInputMovable;
-	private boolean freeze = false;
-	private boolean dialog = false;
-
-	private long processCommandsTimer = System.currentTimeMillis();
 	private DialogBoxMessage questionMessage;
-
-	private LinkedList<ICommand> commands;
 
 	protected Player player;
 	protected EnemiesController enemiesController;
-
-	private GameEngine gameEngine;
+	private LinkedList<ICommand> commands;
 
 	public Player getPlayer() {
 		return player;
@@ -67,7 +63,7 @@ public class GameWindow extends Canvas implements Runnable {
 		this.keyInputMovable = keyInputMovable;
 	}
 
-	public GameWindow(GameEngine gameEngine, String mapFilePath, String questionsPath) {
+	public GameWindow(GameEngine gameEngine, File mapFile, String questionsPath) {
 		this.gameEngine = gameEngine;
 		loadTileSet();
 
@@ -80,23 +76,27 @@ public class GameWindow extends Canvas implements Runnable {
 		gameOver = new GameOver();
 		gameFinish = new GameFinish();
 		keyInputMovable = true;
-		initGame(mapFilePath, questionsPath);
+		initGame(mapFile, questionsPath);
 	}
 
-	public void initGame(String mapFilePath, String questionsPath) {
+	public void initGame(File mapFile, String questionsPath) {
 		level.createQuestionPool(questionsPath);
-		level.setLevel(this, level.loadLevel(mapFilePath));
+		level.setLevel(this, level.loadLevel(mapFile));
 		setPreferredSize(new Dimension(level.getColSize(), level.getRowSize()));
 		setMinimumSize(new Dimension(level.getColSize(), level.getRowSize()));
 		setMaximumSize(new Dimension(level.getColSize(), level.getRowSize()));
 	}
 
-	public void restartGame(String mapFilePath) {
-		level.clearLevel();
-		level.setLevel(this, level.loadLevel(mapFilePath));
-		commands.clear();
+	public void restartGame(File mapFile, String questionsPath) {
 		enemiesController.clear();
 		bulletController.getBulletsList().clear();
+		level.clearLevel();
+		commands.clear();
+		level.createQuestionPool(questionsPath);
+		level.setLevel(this, level.loadLevel(mapFile));
+		dialog = false;
+		freeze = false;
+		gameState = GameState.GAME;
 	}
 
 	private void loadTileSet() {
@@ -128,42 +128,21 @@ public class GameWindow extends Canvas implements Runnable {
 		}
 	}
 
-	@Override
+	/**
+	 * Game loop
+	 */
 	public void run() {
-
 		long initialTime = System.nanoTime();
-		final double timeU = 1000000000 / UPS;
-		final double timeF = 1000000000 / FPS;
-		double deltaU = 0, deltaF = 0;
-		int frames = 0, ticks = 0;
-		long timer = System.currentTimeMillis();
-
+		final double timerFrames = 1000000000 / FPS;
+		double delta = 0;
 		while (running) {
-
 			long currentTime = System.nanoTime();
-			deltaU += (currentTime - initialTime) / timeU;
-			deltaF += (currentTime - initialTime) / timeF;
+			delta += (currentTime - initialTime) / timerFrames;
 			initialTime = currentTime;
-
-			if (deltaU >= 1) {
+			if (delta >= 1) {
 				tick();
-				ticks++;
-				deltaU--;
-			}
-
-			if (deltaF >= 1) {
 				render();
-				frames++;
-				deltaF--;
-			}
-
-			if (System.currentTimeMillis() - timer > 1000) {
-				if (RENDER_TIME) {
-					System.out.println(String.format("UPS: %s, FPS: %s", ticks, frames));
-				}
-				frames = 0;
-				ticks = 0;
-				timer += 1000;
+				delta--;
 			}
 		}
 	}
@@ -203,6 +182,8 @@ public class GameWindow extends Canvas implements Runnable {
 
 			if (Physics.Collision(player, enemy)) {
 				gameState = GameState.OVER;
+				bulletController.getBulletsList().clear();
+				commands.clear();
 			}
 			if (bulletController.collision(enemy)) {
 				enemiesController.increaseKilled();
@@ -234,15 +215,15 @@ public class GameWindow extends Canvas implements Runnable {
 		}
 
 		Graphics g = bufferStrategy.getDrawGraphics();
-
-		/////// Draw on the screen ////////////
-
 		g.drawImage(image, 0, 0, getWidth(), getHeight(), this);
 
 		level.render(g);
 		player.render(g);
 		bulletController.render(g);
 		enemiesController.render(g);
+		if (dialog) {
+			questionMessage.render(g, getWidth(), getHeight());
+		}
 
 		if (gameState == GameState.OVER) {
 			gameOver.render(g, getWidth(), getHeight());
@@ -251,12 +232,6 @@ public class GameWindow extends Canvas implements Runnable {
 			score = score * enemiesController.getEnemyKilled();
 			gameFinish.render(g, getWidth(), getHeight(), score);
 		}
-
-		if (dialog) {
-			questionMessage.render(g, getWidth(), getHeight());
-		}
-
-		//////////////////////////////////////
 
 		g.dispose();
 		bufferStrategy.show();

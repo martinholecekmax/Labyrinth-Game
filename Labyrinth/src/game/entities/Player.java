@@ -1,5 +1,6 @@
 package game.entities;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 import game.engine.Level;
@@ -15,6 +16,42 @@ public class Player extends Entity implements IEntityBullets {
 	
 	public void tick() {
 
+	}
+
+	public boolean moveUp(int steps) {
+		Rectangle rect = new Rectangle(col, row - steps, level.getTileSize(), level.getTileSize());
+		if (level.intersectsSolid(rect) == false && level.contains(rect) && movable) {
+			row -= steps;
+			return true;
+		}
+		return false;
+	}
+
+	public boolean moveDown(int steps) {
+		Rectangle rect = new Rectangle(col, row + steps, level.getTileSize(), level.getTileSize());
+		if (level.intersectsSolid(rect) == false && level.contains(rect) && movable) {
+			row += steps;
+			return true;
+		}
+		return false;
+	}
+
+	public boolean moveRight(int steps) {
+		Rectangle rect = new Rectangle(col + steps, row, level.getTileSize(), level.getTileSize());
+		if (level.intersectsSolid(rect) == false && level.contains(rect) && movable) {
+			col += steps;
+			return true;
+		}
+		return false;
+	}
+
+	public boolean moveLeft(int steps) {
+		Rectangle rect = new Rectangle(col - steps, row, level.getTileSize(), level.getTileSize());
+		if (level.intersectsSolid(rect) == false && level.contains(rect) && movable) {
+			col -= steps;
+			return true;
+		}
+		return false;
 	}
 
 	public void render(Graphics g) {

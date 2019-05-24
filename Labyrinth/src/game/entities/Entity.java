@@ -29,42 +29,6 @@ public class Entity {
 		return new Rectangle(col, row, level.getTileSize(), level.getTileSize());
 	}
 
-	public boolean moveUp(int steps) {
-		Rectangle rect = new Rectangle(col, row - steps, level.getTileSize(), level.getTileSize());
-		if (level.intersectsSolid(rect) == false && level.contains(rect) && movable) {
-			row -= steps;
-			return true;
-		}
-		return false;
-	}
-
-	public boolean moveDown(int steps) {
-		Rectangle rect = new Rectangle(col, row + steps, level.getTileSize(), level.getTileSize());
-		if (level.intersectsSolid(rect) == false && level.contains(rect) && movable) {
-			row += steps;
-			return true;
-		}
-		return false;
-	}
-
-	public boolean moveRight(int steps) {
-		Rectangle rect = new Rectangle(col + steps, row, level.getTileSize(), level.getTileSize());
-		if (level.intersectsSolid(rect) == false && level.contains(rect) && movable) {
-			col += steps;
-			return true;
-		}
-		return false;
-	}
-
-	public boolean moveLeft(int steps) {
-		Rectangle rect = new Rectangle(col - steps, row, level.getTileSize(), level.getTileSize());
-		if (level.intersectsSolid(rect) == false && level.contains(rect) && movable) {
-			col -= steps;
-			return true;
-		}
-		return false;
-	}
-
 	public void setMovable(boolean movable) {
 		this.movable = movable;
 	}

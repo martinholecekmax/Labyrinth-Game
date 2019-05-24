@@ -39,6 +39,6 @@ public class BulletShoot extends Entity implements IEntityBullets {
 	@Override
 	public void render(Graphics g) {
 		g.drawImage(textures.missile, col, row, null);
-		g.drawRect(getBounds().x, getBounds().y, getBounds().width, getBounds().height);
+//		g.drawRect(getBounds().x, getBounds().y, getBounds().width, getBounds().height);
 	}
 }

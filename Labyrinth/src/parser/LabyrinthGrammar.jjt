@@ -217,6 +217,8 @@ void statement() #Statement :
 {}
 {
 				 	LOOKAHEAD(2) assignment()
+				|   LOOKAHEAD(3) arraydef()
+				| 	LOOKAHEAD(3) arrayassign() 
 				|	fndef()
 				|	block()
 				|	ifstatement()	
@@ -225,75 +227,31 @@ void statement() #Statement :
 				|	write()
 				|	call()
 				| 	quit()
-				| 	moveleft()
-				| 	moveright()
-				| 	movedown()
-				| 	moveup()
-				|	shoot()
-				| 	movable()
-				| 	freeze()
-				| 	answer()
+				|   command()
+}
+
+void arraydef() #ArrayDef :
+{}
+{
+					identifier() "[" "]" "=" arrayparamlist() 
+}
+
+void arrayparamlist() #ArrayParamList :
+{}
+{
+					"{" [ expression()  ( "," expression()   )* ] "}"
+}
+
+void arrayassign():
+{}
+{
+  					identifier() "[" expression()  "]" "=" expression() #ArrayAssignment(3)
 }
 
 void quit() #Quit :
 {}
 {
 					< QUIT >
-}
-
-void movable():
-{}
-{
-  					< KEYBOARD > "(" keyboardSet() ")"
-}
-
-void keyboardSet():
-{}
-{
-  	< ON >	#KeyboardOn
- | 	< OFF >	#KeyboardOff
-}
-
-void freeze() #Freeze:
-{}
-{
-  < FREEZE >
-}
-
-void answer():
-{}
-{
-  < ANSWER > "(" expression() ")" #Answer(1)
-}
-
-void moveleft() #MoveLeft:
-{}
-{
-					<MOVE_LEFT>
-}
-
-void moveright() #MoveRight:
-{}
-{
-					<MOVE_RIGHT>
-}
-
-void movedown() #MoveDown:
-{}
-{
-					<MOVE_DOWN>
-}
-
-void moveup() #MoveUp:
-{}
-{
-					<MOVE_UP>
-}
-
-void shoot():
-{}
-{
-					<SHOOT> expression() #Shoot(1)
 }
 
 void block() #Block :
@@ -373,6 +331,78 @@ void arglist() #ArgList :
 }
 
 //
+//	Commands
+//
+
+void command() :
+{}
+{
+                   	moveleft()
+				| 	moveright()
+				| 	movedown()
+				| 	moveup()
+				|	shoot()
+				| 	movable()
+				| 	freeze()
+				| 	answer()
+}
+
+void movable():
+{}
+{
+  					< KEYBOARD > "(" keyboardSet() ")"
+}
+
+void keyboardSet():
+{}
+{
+  	< ON >	#KeyboardOn
+ | 	< OFF >	#KeyboardOff
+}
+
+void freeze() #Freeze:
+{}
+{
+  < FREEZE >
+}
+
+void answer():
+{}
+{
+  < ANSWER > "(" expression() ")" #Answer(1)
+}
+
+void moveleft() #MoveLeft:
+{}
+{
+					<MOVE_LEFT>
+}
+
+void moveright() #MoveRight:
+{}
+{
+					<MOVE_RIGHT>
+}
+
+void movedown() #MoveDown:
+{}
+{
+					<MOVE_DOWN>
+}
+
+void moveup() #MoveUp:
+{}
+{
+					<MOVE_UP>
+}
+
+void shoot():
+{}
+{
+					<SHOOT> expression() #Shoot(1)
+}
+
+//
 // Expressions
 //
 
@@ -439,8 +469,15 @@ void primary_expression() :
 {
                               literal()
                             | LOOKAHEAD(2) fn_invoke()
+                            | LOOKAHEAD(2) array_invoke()
                             | dereference()
                             | "(" expression() ")"
+}
+
+void array_invoke() #ArrayInvoke :
+{}
+{
+					identifier() "[" integer() "]"
 }
 
 void fn_invoke() #FnInvoke :

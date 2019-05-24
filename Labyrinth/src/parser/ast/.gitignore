@@ -55,3 +55,10 @@
 /ASTKeyboardOn.java
 /ASTFreeze.java
 /ASTAnswer.java
+/LabyrinthGrammar.java
+/LabyrinthGrammar.jj
+/LabyrinthGrammarTokenManager.java
+/ASTArrayInvoke.java
+/ASTArrayAssignment.java
+/ASTArrayDef.java
+/ASTArrayParamList.java

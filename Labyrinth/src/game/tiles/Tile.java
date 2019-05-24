@@ -13,7 +13,7 @@ public class Tile {
 	private boolean solid;
 	private int tileSize;
 	private GameObjectType tileType;
-	
+
 	public Tile(int row, int col, int tileSize, BufferedImage texture, GameObjectType tileType, boolean solid) {
 		this.row = row;
 		this.col = col;
@@ -23,14 +23,17 @@ public class Tile {
 		this.solid = solid;
 	}
 
+	public void setTexture(BufferedImage texture) {
+		this.texture = texture;
+	}
+
 	public GameObjectType getTileType() {
 		return tileType;
 	}
-
+	
 	public void render(Graphics g) {
 		g.drawImage(texture, col * tileSize, row * tileSize, null);
 	}
-
 
 	public Rectangle getBounds() {
 		return new Rectangle(col * tileSize, row * tileSize, tileSize, tileSize);

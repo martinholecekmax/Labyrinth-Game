@@ -4,6 +4,10 @@ import parser.ast.ASTAdd;
 import parser.ast.ASTAnd;
 import parser.ast.ASTAnswer;
 import parser.ast.ASTArgList;
+import parser.ast.ASTArrayAssignment;
+import parser.ast.ASTArrayDef;
+import parser.ast.ASTArrayInvoke;
+import parser.ast.ASTArrayParamList;
 import parser.ast.ASTAssignment;
 import parser.ast.ASTBlock;
 import parser.ast.ASTCall;
@@ -356,6 +360,30 @@ public class ParserDebugger implements LabyrinthGrammarVisitor {
 
 	// Answer a question to open the door
 	public Object visit(ASTAnswer node, Object data) {
+		dump(node, data);
+		return data;
+	}
+
+	// Array definition node
+	public Object visit(ASTArrayDef node, Object data) {
+		dump(node, data);
+		return data;
+	}
+
+	// Elements of an array node
+	public Object visit(ASTArrayParamList node, Object data) {
+		dump(node, data);
+		return data;
+	}
+
+	// Assignment statement of an array
+	public Object visit(ASTArrayAssignment node, Object data) {
+		dump(node, data);
+		return data;
+	}
+
+	// Invocation of an array
+	public Object visit(ASTArrayInvoke node, Object data) {
 		dump(node, data);
 		return data;
 	}

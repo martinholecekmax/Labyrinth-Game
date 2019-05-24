@@ -1,6 +1,7 @@
 package interpreter;
 
 import java.util.ArrayList;
+import java.util.Vector;
 
 import game.commands.FreezeCommand;
 import game.commands.ICommand;
@@ -9,66 +10,75 @@ import game.commands.MoveCommand;
 import game.commands.OpenDoorCommand;
 import game.commands.QuitGameCommand;
 import game.commands.ShootCommand;
+import game.commands.WriteCommand;
 import game.enums.Direction;
 import parser.ast.*;
 import values.*;
 
 public class Parser implements LabyrinthGrammarVisitor {
-	
+
 	ArrayList<ICommand> commands = new ArrayList<ICommand>();
+	String message = "";
 	
 	public ArrayList<ICommand> getCommands() {
+		if (!message.isEmpty()) {
+			ICommand command = new WriteCommand(message);
+			commands.add(command);
+		}
 		return commands;
 	}
-	
+
+	// Array structure holds information of the arrays
+	private ArrayStructure arrayStructure = new ArrayStructure();
+
 	// Scope display handler
 	private Display scope = new Display();
-	
+
 	// Get the ith child of a given node.
 	private static SimpleNode getChild(SimpleNode node, int childIndex) {
-		return (SimpleNode)node.jjtGetChild(childIndex);
+		return (SimpleNode) node.jjtGetChild(childIndex);
 	}
-	
+
 	// Get the token value of the ith child of a given node.
 	private static String getTokenOfChild(SimpleNode node, int childIndex) {
 		return getChild(node, childIndex).tokenValue;
 	}
-	
+
 	// Execute a given child of the given node
 	private Object doChild(SimpleNode node, int childIndex, Object data) {
 		return node.jjtGetChild(childIndex).jjtAccept(this, data);
 	}
-	
+
 	// Execute a given child of a given node, and return its value as a Value.
 	// This is used by the expression evaluation nodes.
 	Value doChild(SimpleNode node, int childIndex) {
-		return (Value)doChild(node, childIndex, null);
+		return (Value) doChild(node, childIndex, null);
 	}
-	
+
 	// Execute all children of the given node
 	Object doChildren(SimpleNode node, Object data) {
 		return node.childrenAccept(this, data);
 	}
-	
+
 	// Called if one of the following methods is missing...
 	public Object visit(SimpleNode node, Object data) {
 		System.out.println(node + ": acceptor not implemented in subclass?");
 		return data;
 	}
-	
+
 	// Execute a Sili program
 	public Object visit(ASTCode node, Object data) {
-		return doChildren(node, data);	
+		return doChildren(node, data);
 	}
-	
+
 	// Execute a statement
 	public Object visit(ASTStatement node, Object data) {
-		return doChildren(node, data);	
+		return doChildren(node, data);
 	}
 
 	// Execute a block
 	public Object visit(ASTBlock node, Object data) {
-		return doChildren(node, data);	
+		return doChildren(node, data);
 	}
 
 	// Function definition
@@ -95,29 +105,29 @@ public class Parser implements LabyrinthGrammarVisitor {
 		node.optimised = currentFunctionDefinition;
 		return data;
 	}
-	
+
 	// Function definition parameter list
 	public Object visit(ASTParmlist node, Object data) {
-		FunctionDefinition currentDefinition = (FunctionDefinition)data;
-		for (int i=0; i<node.jjtGetNumChildren(); i++)
+		FunctionDefinition currentDefinition = (FunctionDefinition) data;
+		for (int i = 0; i < node.jjtGetNumChildren(); i++)
 			currentDefinition.defineParameter(getTokenOfChild(node, i));
 		return data;
 	}
-	
+
 	// Function body
 	public Object visit(ASTFnBody node, Object data) {
 		return doChildren(node, data);
 	}
-	
+
 	// Function return expression
 	public Object visit(ASTReturnExpression node, Object data) {
 		return doChildren(node, data);
 	}
-	
+
 	// Function call
 	public Object visit(ASTCall node, Object data) {
 		FunctionDefinition fndef;
-		if (node.optimised == null) { 
+		if (node.optimised == null) {
 			// Child 0 - identifier (fn name)
 			String fnname = getTokenOfChild(node, 0);
 			fndef = scope.findFunction(fnname);
@@ -126,7 +136,7 @@ public class Parser implements LabyrinthGrammarVisitor {
 			// Save it for next time
 			node.optimised = fndef;
 		} else
-			fndef = (FunctionDefinition)node.optimised;
+			fndef = (FunctionDefinition) node.optimised;
 		FunctionInvocation newInvocation = new FunctionInvocation(fndef);
 		// Child 1 - arglist
 		doChild(node, 1, newInvocation);
@@ -134,51 +144,52 @@ public class Parser implements LabyrinthGrammarVisitor {
 		scope.execute(newInvocation, this);
 		return data;
 	}
-	
+
 	// Function invocation in an expression
 	public Object visit(ASTFnInvoke node, Object data) {
 		FunctionDefinition fndef;
-		if (node.optimised == null) { 
+		if (node.optimised == null) {
 			// Child 0 - identifier (fn name)
 			String fnname = getTokenOfChild(node, 0);
 			fndef = scope.findFunction(fnname);
 			if (fndef == null)
 				throw new ExceptionSemantic("Function " + fnname + " is undefined.");
 			if (!fndef.hasReturn())
-				throw new ExceptionSemantic("Function " + fnname + " is being invoked in an expression but does not have a return value.");
+				throw new ExceptionSemantic(
+						"Function " + fnname + " is being invoked in an expression but does not have a return value.");
 			// Save it for next time
 			node.optimised = fndef;
 		} else
-			fndef = (FunctionDefinition)node.optimised;
+			fndef = (FunctionDefinition) node.optimised;
 		FunctionInvocation newInvocation = new FunctionInvocation(fndef);
 		// Child 1 - arglist
 		doChild(node, 1, newInvocation);
 		// Execute
 		return scope.execute(newInvocation, this);
 	}
-	
+
 	// Function invocation argument list.
 	public Object visit(ASTArgList node, Object data) {
-		FunctionInvocation newInvocation = (FunctionInvocation)data;
-		for (int i=0; i<node.jjtGetNumChildren(); i++)
+		FunctionInvocation newInvocation = (FunctionInvocation) data;
+		for (int i = 0; i < node.jjtGetNumChildren(); i++)
 			newInvocation.setArgument(doChild(node, i));
 		newInvocation.checkArgumentCount();
 		return data;
 	}
-	
-	// Execute an IF 
+
+	// Execute an IF
 	public Object visit(ASTIfStatement node, Object data) {
 		// evaluate boolean expression
 		Value hopefullyValueBoolean = doChild(node, 0);
 		if (!(hopefullyValueBoolean instanceof ValueBoolean))
 			throw new ExceptionSemantic("The test expression of an if statement must be boolean.");
-		if (((ValueBoolean)hopefullyValueBoolean).booleanValue())
-			doChild(node, 1);							// if(true), therefore do 'if' statement
-		else if (node.ifHasElse)						// does it have an else statement?
-			doChild(node, 2);							// if(false), therefore do 'else' statement
+		if (((ValueBoolean) hopefullyValueBoolean).booleanValue())
+			doChild(node, 1); // if(true), therefore do 'if' statement
+		else if (node.ifHasElse) // does it have an else statement?
+			doChild(node, 2); // if(false), therefore do 'else' statement
 		return data;
 	}
-	
+
 	// Execute a FOR loop
 	public Object visit(ASTForLoop node, Object data) {
 		// loop initialisation
@@ -188,7 +199,7 @@ public class Parser implements LabyrinthGrammarVisitor {
 			Value hopefullyValueBoolean = doChild(node, 1);
 			if (!(hopefullyValueBoolean instanceof ValueBoolean))
 				throw new ExceptionSemantic("The test expression of a for loop must be boolean.");
-			if (!((ValueBoolean)hopefullyValueBoolean).booleanValue())
+			if (!((ValueBoolean) hopefullyValueBoolean).booleanValue())
 				break;
 			// do loop statement
 			doChild(node, 3);
@@ -197,32 +208,34 @@ public class Parser implements LabyrinthGrammarVisitor {
 		}
 		return data;
 	}
-	
+
 	// Execute a WHILE loop
 	public Object visit(ASTWhileLoop node, Object data) {
 		while (true) {
 			Value expressionValue = doChild(node, 0);
 			if (!(expressionValue instanceof ValueBoolean))
 				throw new ExceptionSemantic("The test expression of a while loop must be boolean");
-			if (!((ValueBoolean)expressionValue).booleanValue())
+			if (!((ValueBoolean) expressionValue).booleanValue())
 				break;
 			doChild(node, 1);
 		}
 		return data;
 	}
-	
+
 	// Process an identifier
-	// This doesn't do anything, but needs to be here because we need an ASTIdentifier node.
+	// This doesn't do anything, but needs to be here because we need an
+	// ASTIdentifier node.
 	public Object visit(ASTIdentifier node, Object data) {
 		return data;
 	}
-	
+
 	// Execute the WRITE statement
 	public Object visit(ASTWrite node, Object data) {
 		System.out.println(doChild(node, 0));
+		message += doChild(node, 0).toString() + "\n";
 		return data;
 	}
-	
+
 	// Dereference a variable or parameter, and return its value.
 	public Object visit(ASTDereference node, Object data) {
 		Display.Reference reference;
@@ -233,10 +246,10 @@ public class Parser implements LabyrinthGrammarVisitor {
 				throw new ExceptionSemantic("Variable or parameter " + name + " is undefined.");
 			node.optimised = reference;
 		} else
-			reference = (Display.Reference)node.optimised;
+			reference = (Display.Reference) node.optimised;
 		return reference.getValue();
 	}
-	
+
 	// Execute an assignment statement.
 	public Object visit(ASTAssignment node, Object data) {
 		Display.Reference reference;
@@ -247,7 +260,7 @@ public class Parser implements LabyrinthGrammarVisitor {
 				reference = scope.defineVariable(name);
 			node.optimised = reference;
 		} else
-			reference = (Display.Reference)node.optimised;
+			reference = (Display.Reference) node.optimised;
 		reference.setValue(doChild(node, 1));
 		return data;
 	}
@@ -371,20 +384,11 @@ public class Parser implements LabyrinthGrammarVisitor {
 
 	// Execute the MOVE LEFT statement
 	public Object visit(ASTMoveLeft node, Object data) {
-//		Value expressionValue = doChild(node, 0);
-//		if (!(expressionValue instanceof ValueInteger))
-//			throw new ExceptionSemantic("The test expression of a while loop must be integer");
-//		int moves = (int) expressionValue.longValue();
-//		for (int i = 0; i < moves; i++) {
-//			ICommand command = new MoveCommand(Direction.LEFT);
-//			commands.add(command);
-//		}
-		
 		ICommand command = new MoveCommand(Direction.LEFT);
 		commands.add(command);
 		return data;
 	}
-	
+
 	// Execute the MOVE RIGHT statement
 	public Object visit(ASTMoveRight node, Object data) {
 		ICommand command = new MoveCommand(Direction.RIGHT);
@@ -460,5 +464,68 @@ public class Parser implements LabyrinthGrammarVisitor {
 		ICommand command = new OpenDoorCommand(expressionValue.stringValue());
 		commands.add(command);
 		return data;
+	}
+
+	// Execute Array definition statement
+	public Object visit(ASTArrayDef node, Object data) {
+		// Already defined?
+		if (node.optimised != null)
+			return data;
+		// Child 0 - identifier (Array name)
+		String arrayName = getTokenOfChild(node, 0);
+		if (arrayStructure.findArray(arrayName) != null)
+			throw new ExceptionSemantic("Array " + arrayName + " already exists.");
+		Vector<Value> elements = new Vector<Value>();
+		// Child 1 - elements list
+		doChild(node, 1, elements);
+		arrayStructure.addArray(arrayName, elements);
+		return data;
+	}
+
+	// Execute parameter list statement (get elements of an array)
+	public Object visit(ASTArrayParamList node, Object data) {
+		@SuppressWarnings("unchecked")
+		Vector<Value> elements = (Vector<Value>) data;
+		for (int i = 0; i < node.jjtGetNumChildren(); i++)
+			elements.add(doChild(node, i));
+		return data;
+	}
+
+	// Execute array assignment statement
+	public Object visit(ASTArrayAssignment node, Object data) {
+		String arrayName = getTokenOfChild(node, 0);
+		Vector<Value> elements = arrayStructure.findArray(arrayName);
+		if (elements == null) {
+			throw new ExceptionSemantic("Array " + arrayName + " is undefined.");
+		}
+		Value index = doChild(node, 1);
+		if (!(index instanceof ValueInteger))
+			throw new ExceptionSemantic("The index of an array must be integer.");
+		int indexValue = (int) index.longValue();
+		if (indexValue >= elements.size()) {
+			throw new ExceptionSemantic("Array index out of range " + indexValue);
+		}
+		elements.set(indexValue, doChild(node, 2));
+		return data;
+	}
+
+	// Execute array invocation statement
+	public Object visit(ASTArrayInvoke node, Object data) {
+		// Child 0 - identifier (array name)
+		String arrayName = getTokenOfChild(node, 0);
+		Vector<Value> elements = arrayStructure.findArray(arrayName);
+		if (elements == null) {
+			throw new ExceptionSemantic("Array " + arrayName + " is undefined.");
+		}
+		Value index = doChild(node, 1);
+		if (!(index instanceof ValueInteger))
+			throw new ExceptionSemantic("The index of an array must be integer.");
+		int indexValue = (int) index.longValue();
+
+		if (indexValue >= elements.size()) {
+			throw new ExceptionSemantic("Array index out of range " + indexValue);
+		}
+		Value element = elements.get(indexValue);
+		return element;
 	}
 }

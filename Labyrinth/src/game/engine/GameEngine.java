@@ -42,6 +42,7 @@ public class GameEngine implements ActionListener {
 	private JPanel panelGame;
 	private JMenuBar menuBar;
 	private JMenu mnFile;
+	private JMenuItem mntmRestartGame;
 	private JMenuItem mntmLoadProgramFile;
 	private JMenuItem mntmLoadMapFile;
 	private JTextArea textAreaProgram;
@@ -52,14 +53,10 @@ public class GameEngine implements ActionListener {
 	private JButton btnGo;
 	private FileNameExtensionFilter fileProgramFilter;
 	private FileNameExtensionFilter fileMapFilter;
-	private String mapFilePath = "/map.csv";
+	private File mapFile;
 	private String questionsPath = "/questions.csv";
 	private GameWindow gameWindow;
 	private int numLines;
-
-//	private static final int WIDTH = 480;
-//	private static final int HEIGHT = WIDTH / 12 * 9;
-//	private static final int SCALE = 2;
 
 	public int getNumLines() {
 		return numLines;
@@ -70,10 +67,7 @@ public class GameEngine implements ActionListener {
 		frame = new JFrame(TITLE);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setResizable(false);
-
-//		frame.setPreferredSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
-//		frame.setMaximumSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
-//		frame.setMinimumSize(new Dimension(WIDTH * SCALE, HEIGHT * SCALE));
+		mapFile = new File(getClass().getClassLoader().getResource("map.csv").getFile());
 
 		splitPane = new JPanel();
 		panelRight = new JPanel();
@@ -84,6 +78,7 @@ public class GameEngine implements ActionListener {
 		menuBar = new JMenuBar();
 		mnFile = new JMenu("File");
 		mntmLoadProgramFile = new JMenuItem("Load Program");
+		mntmRestartGame = new JMenuItem("Restart Game");
 		mntmLoadMapFile = new JMenuItem("Load Map");
 		fileChooser = new JFileChooser();
 
@@ -107,7 +102,7 @@ public class GameEngine implements ActionListener {
 		textMessage.setRows(5);
 		textMessage.setBorder(title);
 
-		gameWindow = new GameWindow(this, mapFilePath, questionsPath);
+		gameWindow = new GameWindow(this, mapFile, questionsPath);
 		panelGame = new JPanel(new GridLayout(1, 1));
 		panelGame.setPreferredSize(gameWindow.getPreferredSize());
 		panelGame.setMinimumSize(gameWindow.getMinimumSize());
@@ -124,6 +119,8 @@ public class GameEngine implements ActionListener {
 
 		frame.setJMenuBar(menuBar);
 		menuBar.add(mnFile);
+		mnFile.add(mntmRestartGame);
+		mntmRestartGame.addActionListener(this);
 		mnFile.add(mntmLoadProgramFile);
 		mntmLoadProgramFile.addActionListener(this);
 		mnFile.add(mntmLoadMapFile);
@@ -133,7 +130,7 @@ public class GameEngine implements ActionListener {
 		fileChooser.setDialogTitle("Choose file");
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.setAcceptAllFileFilterUsed(false);
-		fileProgramFilter = new FileNameExtensionFilter("Labyrinth file", "sil");
+		fileProgramFilter = new FileNameExtensionFilter("Labyrinth file", "lyth");
 		fileMapFilter = new FileNameExtensionFilter("Map file", "csv");
 
 		splitPane.setLayout(new BorderLayout());
@@ -161,8 +158,15 @@ public class GameEngine implements ActionListener {
 			textAreaProgram.setText(textAreaProgram.getText() + readFile());
 		} else if (e.getSource() == mntmLoadMapFile) {
 			fileChooser.setFileFilter(fileMapFilter);
-			String t = readFile();
-			System.out.println(t);
+			if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+				File file = fileChooser.getSelectedFile();
+				gameWindow.restartGame(file, questionsPath);
+			}
+		} else if (e.getSource() == mntmRestartGame) {
+			gameWindow.restartGame(mapFile, questionsPath);
+			numLines = 0;
+			textAreaProgram.setText("");
+			textMessage.setText("");
 		}
 		btnGo.setEnabled(true);
 	}
