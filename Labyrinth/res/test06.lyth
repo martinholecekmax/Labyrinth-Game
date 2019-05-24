@@ -1,0 +1,105 @@
+// Testing walk through the maze
+
+fn one() {
+    left
+    left
+    fire("d")
+    down
+}
+
+fn two() {
+    fire("d")
+    down
+    mvright(3)
+}
+
+fn three() {
+    right
+    mvup(2)
+    mvright(2)
+    mvdown(2)
+    mvright(2)
+    fire("u")
+    up
+    mvright(3)
+    mvdown(6)
+    mvleft(3)
+    fire("d")
+    down
+}
+
+fn four() {
+    fire("d")
+    down
+    fire("l")
+    mvleft(2)
+    mvup(5)
+    mvleft(6)
+    mvdown(2)
+    right
+    fire("d")
+    down
+    fire("r")
+    right
+    fire("d")
+    mvdown(4)
+    mvright(4)
+}
+
+fn five() {
+    mvright(5)
+    mvup(2)
+    left
+}
+
+fn ans() {
+    answer("cpu")
+    answer("1991")
+    answer("packets")
+    answer("Algorithm")
+    answer("Graphical User Interface")
+    answer("address")
+}
+
+fn mvdown(x1) {
+    for (i = 0; i<x1; i=i+1) {
+        fire("d")
+        down
+   }
+}
+
+fn mvup(x1) {
+    for (i = 0; i<x1; i=i+1) {
+        fire("u")
+        up
+   }
+}
+
+fn mvleft(x1) {
+    for (i = 0; i<x1; i=i+1) {
+        fire("l")
+        left
+   }
+}
+
+fn mvright(x1) {
+    for (i = 0; i<x1; i=i+1) {
+        fire("r")
+        right
+   }
+}
+
+one()
+ans()
+
+two()
+ans()
+
+freeze
+three()
+ans()
+
+four()
+ans()
+
+five()

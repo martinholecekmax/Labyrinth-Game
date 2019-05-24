@@ -4,9 +4,16 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
+/**
+ * This class handles special drawing functions
+ * 
+ * @author Martin Holecek
+ *
+ */
 public class DrawSpecials {
 	/**
 	 * Draw Transparent Background
+	 * 
 	 * @param g - Graphics 2D variable pasted from paintComponent method
 	 * @param width - Width of the screen
 	 * @param height - Height of the screen

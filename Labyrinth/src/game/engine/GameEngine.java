@@ -32,6 +32,14 @@ import interpreter.Interpreter;
 import parser.ast.ParseException;
 import parser.ast.TokenMgrError;
 
+/**
+ * Game engine
+ * 
+ * This class creates GUI and controls flow between GUI and controls.
+ * 
+ * @author Martin Holecek
+ *
+ */
 public class GameEngine implements ActionListener {
 
 	private static final String TITLE = "Labyrinth";
@@ -58,10 +66,19 @@ public class GameEngine implements ActionListener {
 	private GameWindow gameWindow;
 	private int numLines;
 
+	/**
+	 * Get number of lines that has been written in the text area.
+	 * This method is used for generation of the scoreboard.
+	 * 
+	 * @return integer of the number of lines
+	 */
 	public int getNumLines() {
 		return numLines;
 	}
 
+	/**
+	 * Constructor of the Game Engine Class
+	 */
 	public GameEngine() {
 
 		frame = new JFrame(TITLE);
@@ -171,6 +188,11 @@ public class GameEngine implements ActionListener {
 		btnGo.setEnabled(true);
 	}
 
+	/**
+	 * This method reads source code file into the string.
+	 * 
+	 * @return string value of the source code file
+	 */
 	private String readFile() {
 		if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 			File file = fileChooser.getSelectedFile();
@@ -192,6 +214,10 @@ public class GameEngine implements ActionListener {
 		return "";
 	}
 
+	/**
+	 * This method gets text from program textarea and send it to the parser.
+	 * The Parser will parse the input and it will output the commands.
+	 */
 	private void parse() {
 		String text = textAreaProgram.getText();
 		String[] textLines = text.trim().split("\n");
@@ -212,6 +238,11 @@ public class GameEngine implements ActionListener {
 		}
 	}
 
+	/**
+	 * This method sets message text area.
+	 * 
+	 * @param text - message text that is going to be set into the text area.
+	 */
 	public void setMessage(String text) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {

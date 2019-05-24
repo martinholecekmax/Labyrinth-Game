@@ -3,6 +3,14 @@ package game.commands;
 import game.engine.GameWindow;
 import game.enums.Direction;
 
+/**
+ * Move Command
+ * 
+ * This command controls a movement of the player.
+ * 
+ * @author Martin Holecek
+ *
+ */
 public class MoveCommand implements ICommand{
 
 	Direction direction;

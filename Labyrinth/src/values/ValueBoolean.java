@@ -1,27 +1,34 @@
 package values;
 
+/**
+ *
+ * This class handles Boolean values
+ * 
+ * @author Dave Voorhis
+ *
+ */
 public class ValueBoolean extends ValueAbstract {
 
 	private boolean internalValue;
-	
+
 	public ValueBoolean(boolean b) {
 		internalValue = b;
 	}
-	
+
 	public String getName() {
 		return "boolean";
 	}
-	
+
 	/** Convert this to a primitive boolean. */
 	public boolean booleanValue() {
 		return internalValue;
 	}
-	
+
 	/** Convert this to a primitive string. */
 	public String stringValue() {
 		return (internalValue) ? "true" : "false";
 	}
-	
+
 	public Value or(Value v) {
 		return new ValueBoolean(internalValue || v.booleanValue());
 	}
@@ -42,9 +49,8 @@ public class ValueBoolean extends ValueAbstract {
 		else
 			return -1;
 	}
-	
+
 	public String toString() {
 		return "" + internalValue;
 	}
 }
-

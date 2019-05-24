@@ -15,6 +15,12 @@ import game.sprites.Textures;
 import game.tiles.Door;
 import game.tiles.Tile;
 
+/**
+ * This class generates and manages the level.
+ * 
+ * @author Martin Holecek
+ *
+ */
 public class Level {
 	private Textures textures;
 	private boolean isPlayerCreated = false;

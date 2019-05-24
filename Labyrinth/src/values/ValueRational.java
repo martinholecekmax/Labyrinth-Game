@@ -1,22 +1,28 @@
 package values;
 
+/**
+ * This class handles Rational numbers
+ * 
+ * @author Martin Holecek
+ *
+ */
 public class ValueRational extends ValueAbstract {
 
 	private double internalValue;
-	
+
 	public ValueRational(double b) {
 		internalValue = b;
 	}
-	
+
 	public String getName() {
 		return "rational";
 	}
-	
+
 	/** Convert this to a primitive double. */
 	public double doubleValue() {
-		return (double)internalValue;
+		return (double) internalValue;
 	}
-	
+
 	/** Convert this to a primitive String. */
 	public String stringValue() {
 		return "" + internalValue;
@@ -30,7 +36,7 @@ public class ValueRational extends ValueAbstract {
 		else
 			return -1;
 	}
-	
+
 	public Value add(Value v) {
 		return new ValueRational(internalValue + v.doubleValue());
 	}
@@ -54,7 +60,7 @@ public class ValueRational extends ValueAbstract {
 	public Value unary_minus() {
 		return new ValueRational(-internalValue);
 	}
-	
+
 	public String toString() {
 		return "" + internalValue;
 	}

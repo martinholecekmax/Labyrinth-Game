@@ -2,12 +2,17 @@ package values;
 
 import interpreter.ExceptionSemantic;
 
+/**
+ * 
+ * @author Dave Voorhis
+ *
+ */
 public abstract class ValueAbstract implements Value {
 
 	public abstract String getName();
 
 	public abstract int compare(Value v);
-	
+
 	public Value or(Value v) {
 		throw new ExceptionSemantic("Cannot perform OR on " + getName() + " and " + v.getName());
 	}
@@ -43,7 +48,7 @@ public abstract class ValueAbstract implements Value {
 	public Value unary_minus() {
 		throw new ExceptionSemantic("Cannot perform - on " + getName());
 	}
-		
+
 	/** Convert this to a primitive boolean. */
 	public boolean booleanValue() {
 		throw new ExceptionSemantic("Cannot convert " + getName() + " to boolean.");
@@ -68,28 +73,28 @@ public abstract class ValueAbstract implements Value {
 	public Value eq(Value v) {
 		return new ValueBoolean(compare(v) == 0);
 	}
-	
+
 	/** Test this value and another for non-equality. */
 	public Value neq(Value v) {
 		return new ValueBoolean(compare(v) != 0);
 	}
-	
+
 	/** Test this value and another for >= */
 	public Value gte(Value v) {
 		return new ValueBoolean(compare(v) >= 0);
 	}
-	
+
 	/** Test this value and another for <= */
 	public Value lte(Value v) {
 		return new ValueBoolean(compare(v) <= 0);
 	}
-	
+
 	/** Test this value and another for > */
 	public Value gt(Value v) {
 		return new ValueBoolean(compare(v) > 0);
 	}
-	
-	/** Test this value and another for < */	
+
+	/** Test this value and another for < */
 	public Value lt(Value v) {
 		return new ValueBoolean(compare(v) < 0);
 	}

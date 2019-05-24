@@ -2,6 +2,14 @@ package game.commands;
 
 import game.engine.GameWindow;
 
+/**
+ * Open Door Command
+ * 
+ * This command will open the door.
+ * 
+ * @author Martin Holecek
+ *
+ */
 public class OpenDoorCommand implements ICommand{
 
 	private String answer;

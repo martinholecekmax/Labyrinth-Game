@@ -1,0 +1,13 @@
+// Test move commands
+
+// MOVE LEFT
+LEFT
+
+// MOVE RIGHT
+RIGHT
+
+// MOVE DOWN
+DOWN
+
+// MOVE UP
+UP

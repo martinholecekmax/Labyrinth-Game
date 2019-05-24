@@ -1,0 +1,13 @@
+// Test shooting commands
+
+// SHOOT LEFT
+FIRE("L")
+
+// SHOOT RIGHT
+FIRE("R")
+
+// SHOOT DOWN
+FIRE("D")
+
+// SHOOT UP
+FIRE("U")

@@ -15,11 +15,22 @@ import game.enums.Direction;
 import parser.ast.*;
 import values.*;
 
+/**
+ * This class parses the abstract syntax tree
+ * 
+ * @author Martin Holecek
+ *
+ */
 public class Parser implements LabyrinthGrammarVisitor {
 
 	ArrayList<ICommand> commands = new ArrayList<ICommand>();
 	String message = "";
 	
+	/**
+	 * Get all commands
+	 * 
+	 * @return list of the commands
+	 */
 	public ArrayList<ICommand> getCommands() {
 		if (!message.isEmpty()) {
 			ICommand command = new WriteCommand(message);

@@ -30,6 +30,9 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.Utilities;
 
 /**
+ * This class has been implemented from
+ * https://github.com/HUSACCT/HUSACCT/blob/master/src/husacct/control/presentation/codeviewer/TextLineNumber.java
+ * 
  * This class will display line numbers for a related text component. The text
  * component must use the same line height for each line. TextLineNumber
  * supports wrapped lines and will highlight the line number of the current line

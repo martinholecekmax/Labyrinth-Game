@@ -2,6 +2,8 @@ package interpreter;
 
 /**
  * This exception is thrown when semantic errors are encountered.
+ * 
+ * @author Dave Voorhis
  */
 public class ExceptionSemantic extends Error {
 

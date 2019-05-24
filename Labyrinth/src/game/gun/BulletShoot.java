@@ -8,13 +8,27 @@ import game.entities.Player;
 import game.enums.Direction;
 import game.sprites.Textures;
 
+/**
+ * Single Bullet object
+ * 
+ * @author Martin Holecek
+ *
+ */
 public class BulletShoot extends Entity implements IEntityBullets {
-	private Textures textures;
+	private Textures texture;
 	private Direction direction;
 
-	public BulletShoot(Player player, Textures textures, Direction direction, Level level) {
+	/**
+	 * Constructor
+	 * 
+	 * @param player    - instance of the player
+	 * @param texture   - texture that will be rendered
+	 * @param direction - direction in which the bullet travels
+	 * @param level     - instance of the level object
+	 */
+	public BulletShoot(Player player, Textures texture, Direction direction, Level level) {
 		super(player.row, player.col, level);
-		this.textures = textures;
+		this.texture = texture;
 		this.direction = direction;
 	}
 
@@ -38,7 +52,8 @@ public class BulletShoot extends Entity implements IEntityBullets {
 
 	@Override
 	public void render(Graphics g) {
-		g.drawImage(textures.missile, col, row, null);
-//		g.drawRect(getBounds().x, getBounds().y, getBounds().width, getBounds().height);
+		g.drawImage(texture.missile, col, row, null);
+		// g.drawRect(getBounds().x, getBounds().y, getBounds().width,
+		// getBounds().height);
 	}
 }

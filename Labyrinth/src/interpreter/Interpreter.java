@@ -12,21 +12,29 @@ import parser.ast.ParseException;
 import parser.ast.TokenMgrError;
 import interpreter.Parser;
 
+/**
+ * This class initiate parsing of the source code
+ * 
+ * @author Martin Holecek
+ *
+ */
 public class Interpreter {
+	/**
+	 * Parse the source code
+	 * 
+	 * @param input - string input of the source code
+	 * @return - List of Commands which controls game environment
+	 * @throws ParseException
+	 * @throws TokenMgrError
+	 */
 	public static ArrayList<ICommand> parse(String input) throws ParseException, TokenMgrError {
-//		ArrayList<ICommand> commands = new ArrayList<ICommand>();
 		Reader reader = new StringReader(input);
-//		ICommand command = new MoveCommand(Direction.LEFT);
-//		ICommand command2 = new MoveCommand(Direction.LEFT);
 		LabyrinthGrammar labyrinthGrammar = new LabyrinthGrammar(reader);
 		ASTCode parser = labyrinthGrammar.code();
 		LabyrinthGrammarVisitor nodeVisitor;
 		Parser p = new Parser();
 		nodeVisitor = p;
 		parser.jjtAccept(nodeVisitor, null);
-//		commands.add(command);
-//		commands.add(command2);
 		return p.getCommands();
-//		return commands;
 	}
 }

@@ -29,6 +29,12 @@ import game.sprites.BufferedImageLoader;
 import game.sprites.Textures;
 import game.tiles.Door;
 
+/**
+ * This class implements the game loop and renders the objects on the screen.
+ * 
+ * @author Martin Holecek
+ *
+ */
 public class GameWindow extends Canvas implements Runnable {
 
 	private static final long serialVersionUID = 1L;
@@ -55,14 +61,32 @@ public class GameWindow extends Canvas implements Runnable {
 	protected EnemiesController enemiesController;
 	private LinkedList<ICommand> commands;
 
+	/**
+	 * Get the player in order to control things such as movement.
+	 * 
+	 * @return object of the player class
+	 */
 	public Player getPlayer() {
 		return player;
 	}
 
+	/**
+	 * This setter will enable or disable the keyboard input.
+	 * 
+	 * @param keyInputMovable - true will enabled keyboard, and false will disable
+	 *                        it.
+	 */
 	public void setKeyInputMovable(boolean keyInputMovable) {
 		this.keyInputMovable = keyInputMovable;
 	}
 
+	/**
+	 * Constructor of the Game Window Class
+	 * 
+	 * @param gameEngine    - instance of the Game Engine object class
+	 * @param mapFile       - File where is the map located
+	 * @param questionsPath - The path of the file where are the questions stored
+	 */
 	public GameWindow(GameEngine gameEngine, File mapFile, String questionsPath) {
 		this.gameEngine = gameEngine;
 		loadTileSet();
@@ -75,10 +99,17 @@ public class GameWindow extends Canvas implements Runnable {
 		bulletController = new BulletController(level);
 		gameOver = new GameOver();
 		gameFinish = new GameFinish();
-		keyInputMovable = true;
+		keyInputMovable = false;
 		initGame(mapFile, questionsPath);
 	}
 
+	/**
+	 * This method will initiate the game, like creation of the level and setting
+	 * the size of the window.
+	 * 
+	 * @param mapFile       - File where is the map located
+	 * @param questionsPath - The path of the file where are the questions stored
+	 */
 	public void initGame(File mapFile, String questionsPath) {
 		level.createQuestionPool(questionsPath);
 		level.setLevel(this, level.loadLevel(mapFile));
@@ -87,6 +118,12 @@ public class GameWindow extends Canvas implements Runnable {
 		setMaximumSize(new Dimension(level.getColSize(), level.getRowSize()));
 	}
 
+	/**
+	 * This method will restart the game.
+	 * 
+	 * @param mapFile       - File where is the map located
+	 * @param questionsPath - The path of the file where are the questions stored
+	 */
 	public void restartGame(File mapFile, String questionsPath) {
 		enemiesController.clear();
 		bulletController.getBulletsList().clear();
@@ -99,6 +136,9 @@ public class GameWindow extends Canvas implements Runnable {
 		gameState = GameState.GAME;
 	}
 
+	/**
+	 * Loading the tile set from the file.
+	 */
 	private void loadTileSet() {
 		BufferedImageLoader loader = new BufferedImageLoader();
 		try {
@@ -108,6 +148,9 @@ public class GameWindow extends Canvas implements Runnable {
 		}
 	}
 
+	/**
+	 * Start the game loop.
+	 */
 	public synchronized void start() {
 		if (!running) {
 			running = true;
@@ -116,6 +159,9 @@ public class GameWindow extends Canvas implements Runnable {
 		}
 	}
 
+	/**
+	 * End the game loop.
+	 */
 	private synchronized void stop() {
 		if (running) {
 			running = false;
@@ -147,6 +193,10 @@ public class GameWindow extends Canvas implements Runnable {
 		}
 	}
 
+	/**
+	 * This method will update position of the player and enemies, handle collisions
+	 * and process commands.
+	 */
 	private void tick() {
 		if (gameState == GameState.GAME && !freeze) {
 			player.tick();
@@ -159,6 +209,9 @@ public class GameWindow extends Canvas implements Runnable {
 		processCommand();
 	}
 
+	/**
+	 * Processing of the commands.
+	 */
 	private void processCommand() {
 		if (!commands.isEmpty() && System.currentTimeMillis() - processCommandsTimer > 300) {
 			ICommand command = commands.poll();
@@ -174,6 +227,9 @@ public class GameWindow extends Canvas implements Runnable {
 		}
 	}
 
+	/**
+	 * Manage collisions between player, enemies, bullets and other objects.
+	 */
 	private void collision() {
 		Iterator<IEntityEnemy> iter = enemiesController.iterator();
 
@@ -206,6 +262,9 @@ public class GameWindow extends Canvas implements Runnable {
 		}
 	}
 
+	/**
+	 * Render objects on the screen.
+	 */
 	private void render() {
 		BufferStrategy bufferStrategy = this.getBufferStrategy();
 
@@ -237,10 +296,21 @@ public class GameWindow extends Canvas implements Runnable {
 		bufferStrategy.show();
 	}
 
+	/**
+	 * Add new command to the list of commands which will be processed by
+	 * processCommands method.
+	 * 
+	 * @param command - instance of the command interface
+	 */
 	public void addCommand(ICommand command) {
 		commands.add(command);
 	}
 
+	/**
+	 * Handle keyboard control.
+	 * 
+	 * @param e - key event
+	 */
 	public void keyPressed(KeyEvent e) {
 		if (gameState == GameState.GAME && keyInputMovable) {
 			int key = e.getKeyCode();
@@ -264,18 +334,36 @@ public class GameWindow extends Canvas implements Runnable {
 		}
 	}
 
+	/**
+	 * Add bullet to the bullet controller.
+	 * 
+	 * @param direction - direction of the bullet
+	 */
 	public void shoot(Direction direction) {
 		bulletController.addBullet(new BulletShoot(player, textures, direction, level));
 	}
 
+	/**
+	 * Set the message inside the text area.
+	 * 
+	 * @param message
+	 */
 	public synchronized void setMessage(String message) {
 		gameEngine.setMessage(message);
 	}
 
+	/**
+	 * This method will freeze all enemies for several seconds.
+	 */
 	public void freezeEnemies() {
 		enemiesController.setFreeze(true);
 	}
 
+	/**
+	 * This method will open the door if the player is standing on it.
+	 * 
+	 * @param answer
+	 */
 	public void openDoor(String answer) {
 		Door door = (Door) level.getTile(player.getBounds(), GameObjectType.DOOR);
 		if (door != null) {

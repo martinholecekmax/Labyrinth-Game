@@ -2,6 +2,12 @@ package game.sprites;
 
 import java.awt.image.BufferedImage;
 
+/**
+ * This class handles the textures of game objects.
+ * 
+ * @author Martin Holecek
+ *
+ */
 public class Textures {
 
 	private SpriteSheet spriteSheet = null;
@@ -14,11 +20,19 @@ public class Textures {
 	public BufferedImage doorClosed;
 	public BufferedImage doorOpened;
 
+	/**
+	 * Constructor
+	 * 
+	 * @param spriteSheet - Image tile set of the game objects
+	 */
 	public Textures(BufferedImage spriteSheet) {
 		this.spriteSheet = new SpriteSheet(spriteSheet);
 		getTextures();
 	}
 
+	/**
+	 * Store texture of the game objects
+	 */
 	private void getTextures() {
 		player = spriteSheet.grabImage(1, 3, 32, 32);
 		missile = spriteSheet.grabImage(10, 12, 32, 32);

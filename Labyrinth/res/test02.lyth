@@ -1,0 +1,12 @@
+// Test while and for loop
+
+x = 10
+while (x > 0) {
+	write x
+	x = x - 1
+}
+
+a = 10
+for (i=1; i <= a ; i=i+1) {
+  write i
+}

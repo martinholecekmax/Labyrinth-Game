@@ -54,10 +54,16 @@ import parser.ast.ASTWrite;
 import parser.ast.LabyrinthGrammarVisitor;
 import parser.ast.SimpleNode;
 
+/**
+ * This class can be used for debugging of the abstract syntax tree
+ * 
+ * @author Martin Holecek
+ *
+ */
 public class ParserDebugger implements LabyrinthGrammarVisitor {
-	
+
 	private int indent = 0;
-	
+
 	private String indentString() {
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < indent; ++i) {
@@ -65,27 +71,27 @@ public class ParserDebugger implements LabyrinthGrammarVisitor {
 		}
 		return sb.toString();
 	}
-	
+
 	/** Debugging dump of a node. */
 	private Object dump(SimpleNode node, Object data) {
 		System.out.println(indentString() + node);
 		++indent;
 		data = node.childrenAccept(this, data);
 		--indent;
-		return data;		
+		return data;
 	}
-	
+
 	public Object visit(SimpleNode node, Object data) {
 		System.out.println(node + ": acceptor not implemented in subclass?");
 		return data;
 	}
-	
+
 	// Execute a Sili program
 	public Object visit(ASTCode node, Object data) {
 		dump(node, data);
 		return data;
 	}
-	
+
 	// Execute a statement
 	public Object visit(ASTStatement node, Object data) {
 		dump(node, data);
@@ -95,89 +101,91 @@ public class ParserDebugger implements LabyrinthGrammarVisitor {
 	// Execute a block
 	public Object visit(ASTBlock node, Object data) {
 		dump(node, data);
-		return data;	
+		return data;
 	}
 
-	// Execute an IF 
+	// Execute an IF
 	public Object visit(ASTIfStatement node, Object data) {
 		dump(node, data);
 		return data;
 	}
-	
+
 	// Function definition parameter list
 	public Object visit(ASTParmlist node, Object data) {
 		dump(node, data);
 		return data;
 	}
-	
+
 	// Function body
 	public Object visit(ASTFnBody node, Object data) {
 		dump(node, data);
 		return data;
 	}
-	
+
 	// Function definition
 	public Object visit(ASTFnDef node, Object data) {
 		dump(node, data);
 		return data;
 	}
-	
+
 	// Function return expression
 	public Object visit(ASTReturnExpression node, Object data) {
 		dump(node, data);
 		return data;
 	}
-	
+
 	// Function argument list
 	public Object visit(ASTArgList node, Object data) {
 		dump(node, data);
 		return data;
 	}
-	
+
 	// Function call
 	public Object visit(ASTCall node, Object data) {
 		dump(node, data);
 		return data;
 	}
-	
+
 	// Function invocation in an expression
 	public Object visit(ASTFnInvoke node, Object data) {
 		dump(node, data);
 		return data;
 	}
-	
+
 	// Dereference a variable, and push its value onto the stack
 	public Object visit(ASTDereference node, Object data) {
 		dump(node, data);
 		return data;
 	}
-	
+
 	// Execute a FOR loop
 	public Object visit(ASTForLoop node, Object data) {
 		dump(node, data);
 		return data;
 	}
-	
+
 	// Execute a WHILE loop
 	public Object visit(ASTWhileLoop node, Object data) {
 		dump(node, data);
 		return data;
 	}
-	
+
 	// Process an identifier
-	// This doesn't do anything, but needs to be here because we need an ASTIdentifier node.
+	// This doesn't do anything, but needs to be here because we need an
+	// ASTIdentifier node.
 	public Object visit(ASTIdentifier node, Object data) {
 		dump(node, data);
 		return data;
 	}
-	
+
 	// Execute the WRITE statement
 	public Object visit(ASTWrite node, Object data) {
 		dump(node, data);
 		return data;
 	}
-	
-	// Execute an assignment statement, by popping a value off the stack and assigning it
+
+	// Execute an assignment statement, by popping a value off the stack and
+	// assigning it
 	// to a variable.
 	public Object visit(ASTAssignment node, Object data) {
 		dump(node, data);
@@ -193,7 +201,7 @@ public class ParserDebugger implements LabyrinthGrammarVisitor {
 	// AND
 	public Object visit(ASTAnd node, Object data) {
 		dump(node, data);
-		return data;		
+		return data;
 	}
 
 	// ==
@@ -279,7 +287,7 @@ public class ParserDebugger implements LabyrinthGrammarVisitor {
 		dump(node, data);
 		return data;
 	}
-	
+
 	// Push integer literal to stack
 	public Object visit(ASTInteger node, Object data) {
 		dump(node, data);

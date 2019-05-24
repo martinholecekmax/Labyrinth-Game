@@ -1,27 +1,34 @@
 package values;
 
+/**
+ * 
+ * This class handles Integers
+ * 
+ * @author Dave Voorhis
+ *
+ */
 public class ValueInteger extends ValueAbstract {
 
 	private long internalValue;
-	
+
 	public ValueInteger(long b) {
 		internalValue = b;
 	}
-	
+
 	public String getName() {
 		return "integer";
 	}
-	
+
 	/** Convert this to a primitive long. */
 	public long longValue() {
 		return internalValue;
 	}
-	
+
 	/** Convert this to a primitive double. */
 	public double doubleValue() {
-		return (double)internalValue;
+		return (double) internalValue;
 	}
-	
+
 	/** Convert this to a primitive String. */
 	public String stringValue() {
 		return "" + internalValue;
@@ -35,7 +42,7 @@ public class ValueInteger extends ValueAbstract {
 		else
 			return -1;
 	}
-	
+
 	public Value add(Value v) {
 		return new ValueInteger(internalValue + v.longValue());
 	}
@@ -59,9 +66,8 @@ public class ValueInteger extends ValueAbstract {
 	public Value unary_minus() {
 		return new ValueInteger(-internalValue);
 	}
-	
+
 	public String toString() {
 		return "" + internalValue;
 	}
 }
-
